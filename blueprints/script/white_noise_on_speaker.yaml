@@ -1,0 +1,33 @@
+blueprint:
+  name: White Noise on a Speaker
+  domain: script
+  description: Play 12 hour white noise on designated speaker
+  input:
+    speaker: 
+      name: Speaker to play noise on
+      description: Google Hub or Chromecast device to cast to
+      selector:
+        entity:
+          integration: cast
+
+sequence:
+  - service: media_player.volume_mute
+    data:
+      is_volume_muted: true
+      entity_id: !input speaker
+  - service: media_player.play_media
+    data:
+      entity_id: !input speaker
+      media_content_id: http://10.0.0.2:8123/local/white_noise_12hours.mp3
+      media_content_type: MUSIC
+  - delay:
+      seconds: 1
+  - service: media_player.volume_set
+    data:
+      entity_id: !input speaker
+      volume_level: 0.8
+  - service: media_player.volume_mute
+    data:
+      is_volume_muted: false
+      entity_id: !input speaker
+

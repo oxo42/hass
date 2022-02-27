@@ -1,0 +1,48 @@
+---
+# Handle presence detection
+
+# Allow an override if someone is home
+input_boolean:
+  manual_home_present:
+    name: Someone is home OVERRIDE
+    initial: off
+    icon: mdi:home
+
+# Triggers when home has been empty for 10 mintues
+# This is the thing all the home away automations should tee off
+template:
+  - binary_sensor:
+      - name: home_empty
+        delay_on:
+          minutes: 10
+        delay_off: 0
+        state: >
+          {{  is_state('input_boolean.manual_home_present', 'off') 
+              and is_state('group.squatters', 'not_home') }}
+
+group:
+  squatters:
+    # People that are often in the house.  Add Sue when she comes
+    name: Squatters
+    entities:
+      - person.callie
+      - person.erika
+      - person.sue
+      - person.ox
+
+automation:
+  - id: someone_is_coming_home
+    alias: "Home: Someone is coming home"
+    trigger:
+      platform: zone
+      entity_id:
+        - person.ox
+        - person.sue
+      zone: zone.home
+      event: enter
+    action:
+      - service: switch.turn_on
+        entity_id: switch.garage_lights
+      - service: ifttt.trigger
+        data:
+          event: kettle_on

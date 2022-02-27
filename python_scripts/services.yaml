@@ -1,0 +1,14 @@
+# services.yaml
+set_state:
+  name: Set the state for an entity
+  description: Set the state for an entity and optionally the icon
+  fields:
+    entity_id:
+      description: The entity that will be changed
+      example: binary_sensor.foo
+    state:
+      description: The value of the state to set
+      example: 'on'
+    icon:
+      description: Icon to set on the entity
+      example: 'mdi:baby'

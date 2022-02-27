@@ -1,0 +1,143 @@
+---
+# The light by the front door
+# At night, 9pm to sunrise
+# When motion is detected at the landing or passage, turn the light on for 10 minutes at 1%
+
+automation:
+  - id: front_door_light_at_night
+    alias: "Living Room: Walking around lights at night"
+    mode: restart
+    max_exceeded: silent
+    condition: "{{ is_state('sensor.home_state', 'night') }}"
+    trigger:
+      platform: state
+      entity_id:
+        - binary_sensor.hallway_sensor_motion
+        - binary_sensor.landing_sensor_motion
+      from: "off"
+      to: "on"
+    action:
+      - service: light.turn_on
+        data:
+          entity_id: light.front_door_light
+          brightness: 60
+          transition: 3
+      - wait_for_trigger:
+          platform: state
+          entity_id:
+            - binary_sensor.hallway_sensor_motion
+            - binary_sensor.landing_sensor_motion
+          from: "on"
+          to: "off"
+      - delay: 00:05:00
+      - service: light.turn_off
+        data:
+          entity_id: light.front_door_light
+          transition: 3
+
+  - id: front_door_light_off_at_sunrise
+    alias: "Living Room: Turn off front door light at sunrise"
+    trigger:
+      platform: sun
+      event: sunrise
+      offset: "+01:00:00"
+    action:
+      service: light.turn_off
+      entity_id: light.front_door_light
+
+  - id: roomba_start
+    alias: "Living Room: Start roomba when home empty"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.home_empty
+        to: "on"
+    action:
+      - service: vacuum.start
+        target:
+          entity_id: vacuum.marvin
+
+  - id: roomba_dock
+    alias: "Living Room: Dock roomba when home not empty or idle for 10 minutes"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.home_empty
+        from: "on"
+        to: "off"
+      - platform: state
+        entity_id: vacuum.marvin
+        to: "idle"
+        for: "00:10:00"
+    action:
+      - service: vacuum.return_to_base
+        target:
+          entity_id: vacuum.marvin
+
+  - id: sink_lights_on_motion
+    alias: "Living Room: Kitchen sink lights on motion"
+    mode: restart
+    condition: "{{ not is_state('sensor.home_state', 'night') }}"
+    trigger:
+      platform: state
+      entity_id: binary_sensor.kitchen_sink_motion
+      from: "off"
+      to: "on"
+    action:
+      - alias: "Turn on the light"
+        service: switch.turn_on
+        target:
+          entity_id: switch.sink_lights
+      - alias: "Wait until there is no motion from device"
+        wait_for_trigger:
+          platform: state
+          entity_id: binary_sensor.kitchen_sink_motion
+          from: "on"
+          to: "off"
+      - alias: "Wait the number of seconds that has been set"
+        delay: 60
+      - alias: "Turn off the light"
+        service: switch.turn_off
+        target:
+          entity_id: switch.sink_lights
+
+  - id: front_door_dash_bright_during_day
+    alias: "Living Room: Front Door Dash - Screen bright during the day"
+    trigger:
+      - platform: state
+        entity_id: sensor.home_state
+        to:
+          - day
+          - evening
+      - platform: homeassistant
+        event: start
+    action:
+      service: light.turn_on
+      target:
+        entity_id: light.front_door_dash_screen
+      data:
+        brightness: 40
+
+  - id: front_door_dash_turn_on_during_day
+    alias: "Living Room: Front Door Dash - Turn off at day"
+    trigger:
+      - platform: state
+        entity_id: sensor.home_state
+        to:
+          - day
+    action:
+      service: light.turn_on
+      target:
+        entity_id: light.front_door_dash_screen
+      data:
+        brightness: 40
+
+  - id: front_door_dash_turn_off_at_night
+    alias: "Living Room: Front Door Dash - Turn off at night"
+    trigger:
+      - platform: state
+        entity_id: sensor.home_state
+        to:
+          - night
+    action:
+      service: light.turn_off
+      target:
+        entity_id: light.front_door_dash_screen

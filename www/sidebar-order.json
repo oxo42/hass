@@ -1,0 +1,27 @@
+{
+  "order": [
+    {
+      "item": "hacs",
+      "order": 8
+    },
+    {
+      "new_item": true,
+      "item": "ZWave-JS",
+      "href": "https://nucker:8091/",
+      "icon": "mdi:z-wave",
+      "target": "_blank",
+      "order": 20,
+      "bottom": true
+    },
+    {
+      "item": "developer tools",
+      "bottom": true,
+      "order": 22
+    },
+    {
+      "item": "configuration",
+      "bottom": true,
+      "order": 23
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+homeassistant:
+  packages: !include_dir_named packages
+frontend:
+  themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /hacsfiles/custom-sidebar-v2/custom-sidebar-v2.js
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+# cloud: !include cloud.yaml
+
+logger:
+  default: warn
+  # default: info
+  # logs:
+  #   homeassistant.components.zha: debug
+  #   zigpy: debug
+
+nest: !include nest.yaml
+google:
+  client_id: !secret hass_client_id
+  client_secret: !secret hass_client_secret
+
+sensor:
+  - platform: time_date
+    display_options:
+      - "date_time_iso"
+  - platform: schedule_state
+    name: home_state
+    default_state: day
+    events:
+      - state: night
+      - start_template: "{{ as_timestamp(state_attr('sun.sun', 'next_rising')) }}"
+        end_template: "{{ as_timestamp(state_attr('sun.sun', 'next_setting')) }}"
+        state: day
+      - start: "18:00"
+        end: "22:00"
+        state: evening
+
+python_script:
+
+zha:
+  zigpy_config:
+    ota:
+      ikea_provider: true
+      ledvance_provider: true
+
+panel_custom:
+  - name: ha_integ
+    sidebar_title: Integrations
+    sidebar_icon: mdi:chip
+    js_url: /api/hassio/app/entrypoint.js
+    url_path: "config/integrations"
+    embed_iframe: true
+    require_admin: true
+    config:
+      ingress: core_configurator
+  - name: ha_auto
+    sidebar_title: Automations
+    sidebar_icon: mdi:cog-outline
+    js_url: /api/hassio/app/entrypoint.js
+    url_path: "config/automation"
+    embed_iframe: true
+    require_admin: true
+    config:
+      ingress: core_configurator
+
+ifttt:
+  key: !secret ifttt_key
+
+mqtt:
+  broker: 10.0.0.2

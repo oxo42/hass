@@ -1,0 +1,52 @@
+blueprint:
+  name: ZHA - Samsung SmartThings Button
+  description: Automate your Samsung SmartThings button using ZHA events.
+  domain: automation
+  input:
+    samsung_smartthings_button:
+      name: Samsung SmartThings Button
+      description: The Samsung SmartThings button to use
+      selector:
+        device:
+          integration: zha
+          manufacturer: Samjin
+          model: button
+    remote_button_short_press:
+      name: Single Press
+      description: Action to run on single press
+      default: []
+      selector:
+        action: {}
+    remote_button_double_press:
+      name: Double Press
+      description: Action to run on double press
+      default: []
+      selector:
+        action: {}
+    remote_button_hold_press:
+      name: Hold Press
+      description: Action to run on hold
+      default: []
+      selector:
+        action: {}
+  source_url: https://community.home-assistant.io/t/zha-samsung-smartthings-button/268763
+mode: restart
+max_exceeded: silent
+trigger:
+- platform: event
+  event_type: zha_event
+  event_data:
+    device_id: !input 'samsung_smartthings_button'
+action:
+- variables:
+    press_type: '{{ trigger.event.data.args.press_type }}'
+- choose:
+  - conditions:
+    - '{{ press_type == ''single'' }}'
+    sequence: !input 'remote_button_short_press'
+  - conditions:
+    - '{{ press_type == ''double'' }}'
+    sequence: !input 'remote_button_double_press'
+  - conditions:
+    - '{{ press_type == ''hold'' }}'
+    sequence: !input 'remote_button_hold_press'

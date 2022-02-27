@@ -1,0 +1,131 @@
+---
+group:
+  bedroom_blinds:
+    entities:
+      - cover.bedroom_blind_left
+      - cover.bedroom_blind_center
+      - cover.bedroom_blind_right
+    icon: mdi:blinds
+    name: Bedroom Blinds
+
+automation bedroom:
+  - id: "1642193685430"
+    alias: "Bedroom: Baby Button Automation"
+    description: ""
+    use_blueprint:
+      path: carlosmesquita/zha-xiaomi-mijia-round-wireless-switch-wxkg01lm-lumi-sensor-switch.yaml
+      input:
+        mijia_round_switch: 2c3c90b846cae7387d4f80eb6ff95e7a
+        remote_button_short_press:
+          - scene: scene.baby_going_to_sleep
+        remote_button_double_press:
+          - scene: scene.baby_changing
+        remote_button_hold_press:
+          - scene: scene.baby_going_to_sleep
+          - service: script.white_noise_baby_speaker
+        remote_button_triple_press:
+          - service: media_player.media_stop
+            target:
+              entity_id: media_player.bedroom_speaker
+
+  - id: bedroom_blinds_shut
+    alias: "Bedroom: Blinds shut at sunset"
+    trigger:
+      - platform: sun
+        event: sunset
+    action:
+      - service: cover.close_cover
+        target:
+          area_id: bedroom
+
+  - id: bedroom_blinds_open
+    alias: "Bedroom: Blinds open at 8am"
+    trigger:
+      - platform: time
+        at: 08:00
+    action:
+      - service: cover.open_cover
+        target:
+          area_id: bedroom
+
+  - id: bedroom_blind_remote_open
+    alias: "Bedroom: Blind Remote - Open"
+    trigger:
+      - device_id: 5227e002c9b20a4248fdd6f793186735
+        domain: zha
+        platform: device
+        type: remote_button_short_press
+        subtype: open
+    action:
+      - service: cover.open_cover
+        target:
+          area_id: bedroom
+
+  - id: bedroom_blind_remote_close
+    alias: "Bedroom: Blind Remote - Close"
+    trigger:
+      - device_id: 5227e002c9b20a4248fdd6f793186735
+        domain: zha
+        platform: device
+        type: remote_button_short_press
+        subtype: close
+    action:
+      - service: cover.close_cover
+        target:
+          area_id: bedroom
+
+  - id: "1642637909283"
+    alias: "Bedroom: Magic Cube Automation"
+    description: ""
+    use_blueprint:
+      path: Mikkelmoeller/aqara-magic-cube-zha-51-actions.yaml
+      input:
+        # Bedroom: Magic Cube
+        remote: 2cdae784500840d01db8b7006133db64
+        flip_90: true
+        cube_flip_90:
+          - service: light.toggle
+            target:
+              entity_id: light.baby_light
+        # flip_180: true
+        # cube_flip_180:
+        #   - type: toggle
+        #     device_id: 19baaf95ed6fdb00a9aa638567fc5e46
+        #     entity_id: switch.ox_bedside_light
+        #     domain: switch
+        rotate_right:
+          - device_id: 69aa78aa4a0759287ea16b1b7314664a
+            domain: light
+            entity_id: light.baby_light
+            type: brightness_increase
+        rotate_left:
+          - device_id: 69aa78aa4a0759287ea16b1b7314664a
+            domain: light
+            entity_id: light.baby_light
+            type: brightness_decrease
+        knock_any_side: true
+        cube_knock_any:
+          - scene: scene.baby_going_to_sleep
+          - service: script.white_noise_baby_speaker
+        cube_shake:
+          - service: media_player.media_stop
+            entity_id: media_player.bedroom_speaker
+
+scene:
+  - id: baby_changing
+    name: Baby Changing
+    entities:
+      light.baby_light:
+        brightness: 3
+        state: "on"
+      switch.ox_bedside_light:
+        friendly_name: Ox Bedside Light
+        state: "off"
+    icon: mdi:human-baby-changing-table
+
+  - id: baby_sleeping
+    name: Baby going to sleep
+    icon: mdi:sleep
+    entities:
+      light.baby_light:
+        state: "off"

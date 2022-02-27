@@ -1,0 +1,44 @@
+---
+template:
+  - binary_sensor:
+      - name: garage_active
+        delay_on: 0
+        delay_off: 00:10:00
+        state: >
+          {{  is_state('cover.garage_door', 'open') 
+              or is_state('binary_sensor.garage_mudroom_door', 'on') }}
+
+automation garage:
+  - id: garage_lights_on
+    alias: "Garage: light on when doors open"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.garage_active
+        to: "on"
+    action:
+      service: switch.turn_on
+      entity_id: switch.garage_lights
+
+  - id: garage_lights_off
+    alias: "Garage: lights off when doors closed"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.garage_active
+        to: "off"
+    action:
+      service: switch.turn_off
+      entity_id: switch.garage_lights
+
+  # If you turn the lights off when you leave, the sensor won't reset for 10 minutes so the lights won't come on the next time you open the door
+  # This resets the sensor state
+  - id: garage_active_sensor_reset
+    alias: "Garage: Reset garage_active sensor when lights turned off"
+    trigger:
+      - platform: state
+        entity_id: switch.garage_lights
+        to: "off"
+    action:
+      service: python_script.set_state
+      data_template:
+        entity_id: binary_sensor.garage_active
+        state: "off"
