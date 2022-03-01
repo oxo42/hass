@@ -130,4 +130,4 @@ automation:
         double_tap_on:
           - scene: scene.study_lights_on_day
         double_tap_off:
-          - scene: scene.study_lights_on_night
+          - scene: scene.study_lights_off

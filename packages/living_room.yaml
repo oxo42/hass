@@ -117,18 +117,16 @@ automation:
         brightness: 40
 
   - id: front_door_dash_turn_on_during_day
-    alias: "Living Room: Front Door Dash - Turn off at day"
+    alias: "Living Room: Front Door Dash - Turn on at day"
     trigger:
       - platform: state
         entity_id: sensor.home_state
         to:
           - day
     action:
-      service: light.turn_on
+      service: switch.turn_off
       target:
-        entity_id: light.front_door_dash_screen
-      data:
-        brightness: 40
+        entity_id: switch.front_door_dash_screensaver
 
   - id: front_door_dash_turn_off_at_night
     alias: "Living Room: Front Door Dash - Turn off at night"
@@ -138,6 +136,6 @@ automation:
         to:
           - night
     action:
-      service: light.turn_off
+      service: switch.turn_on
       target:
-        entity_id: light.front_door_dash_screen
+        entity_id: switch.front_door_dash_screensaver
