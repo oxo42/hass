@@ -1,7 +1,11 @@
 ---
-# The light by the front door
-# At night, 9pm to sunrise
-# When motion is detected at the landing or passage, turn the light on for 10 minutes at 1%
+template:
+  - sensor:
+      - name: Range Temperature F
+        # unit_of_measurement: "°F"
+        icon: mdi:thermometer
+        state: >
+          {{ (states('sensor.range_temperature_measurement') | float * 9 / 5) + 32  }}
 
 automation:
   - id: front_door_light_at_night
