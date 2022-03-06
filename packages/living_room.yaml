@@ -143,3 +143,25 @@ automation:
       service: switch.turn_on
       target:
         entity_id: switch.front_door_dash_screensaver
+
+  - id: front_door_dash_set_screensaver_timeout
+    alias: "Living Room: Front Door Dash - Set Screensaver Timeout"
+    trigger:
+      - platform: state
+        entity_id: sensor.home_state
+      - platform: homeassistant
+        event: start
+    action:
+      - service: number.set_value
+        entity_id: number.front_door_dash_screensaver_timer
+        data:
+          value: >
+            {% if is_state('sensor.home_state', 'day') %}
+              1800
+            {% elif is_state('sensor.home_state', 'evening') %}
+              60
+            {% else %}
+              10
+            {% endif %}
+      - service: button.press
+        entity_id: button.front_door_dash_load_start_url
