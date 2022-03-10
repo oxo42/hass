@@ -165,3 +165,35 @@ automation:
             {% endif %}
       - service: button.press
         entity_id: button.front_door_dash_load_start_url
+
+  - id: kitchen_speaker_announce_trash_day
+    alias: "Living Room: Kitchen Speaker - Announce Trash Dash"
+    trigger:
+      - platform: time
+        at: "07:45:00"
+    condition:
+      condition: or
+      conditions:
+        - condition: state
+          entity_id: sensor.garbage_trash
+          state: "0"
+        - condition: state
+          entity_id: sensor.garbage_recycling
+          state: "0"
+    action:
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.kitchen_display
+          volume_level: 0.8
+      - service: tts.cloud_say
+        data:
+          entity_id: media_player.kitchen_display
+          message: >
+            It is Garbage day.  Don't forget to take out the trash
+            {% if is_state('sensor.garbage_recycling', '0') %}
+             and the recycling
+            {% endif %}
+      - service: media_player.volume_set
+        data:
+          entity_id: media_player.kitchen_display
+          volume_level: 0.4
