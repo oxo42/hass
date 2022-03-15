@@ -44,8 +44,8 @@ automation garage:
         entity_id: binary_sensor.garage_active
         state: "off"
 
-  - id: garage_door_close_on_idle
-    alias: "Garage: Close door when no motion for 30 minutes"
+  - id: garage_door_notify_on_idle
+    alias: "Garage: Door - Notify Ox when open 30 minutes"
     mode: restart
     trigger:
       - platform: state
@@ -99,3 +99,21 @@ automation garage:
                   entity_id: media_player.kitchen_display
                   message: >
                     The garage door has been left open
+
+  - id: garage_door_close_on_idle
+    alias: "Garage: Door - Close when no motion for 1 hour"
+    mode: restart
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.garage_sensor_motion
+        from: "on"
+        to: "off"
+        for: 01:00:00
+    condition:
+      - condition: state
+        entity_id: cover.garage_door
+        state: open
+    action:
+      - service: cover.close_cover
+        target:
+          entity_id: cover.garage_door
