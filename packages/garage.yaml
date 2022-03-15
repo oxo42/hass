@@ -16,8 +16,8 @@ automation garage:
         entity_id: binary_sensor.garage_active
         to: "on"
     action:
-      service: switch.turn_on
-      entity_id: switch.garage_lights
+      service: light.turn_on
+      entity_id: light.garage_lights
 
   - id: garage_lights_off
     alias: "Garage: lights off when doors closed"
@@ -26,8 +26,8 @@ automation garage:
         entity_id: binary_sensor.garage_active
         to: "off"
     action:
-      service: switch.turn_off
-      entity_id: switch.garage_lights
+      service: light.turn_off
+      entity_id: light.garage_lights
 
   # If you turn the lights off when you leave, the sensor won't reset for 10 minutes so the lights won't come on the next time you open the door
   # This resets the sensor state

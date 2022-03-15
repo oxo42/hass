@@ -17,7 +17,7 @@ scene:
   - id: study_lights_on_day
     name: "Study: Lights on day"
     entities:
-      switch.study_ceiling_lights: "on"
+      light.study_ceiling_lights: "on"
       light.study_lamp:
         state: "on"
         brightness: 255
@@ -26,7 +26,7 @@ scene:
   - id: study_lights_on_night
     name: "Study: Lights on night"
     entities:
-      switch.study_ceiling_lights: "off"
+      light.study_ceiling_lights: "off"
       light.study_lamp:
         state: "on"
         brightness: 255
@@ -35,7 +35,7 @@ scene:
   - id: study_lights_off
     name: "Study: Lights off"
     entities:
-      switch.study_ceiling_lights: "off"
+      light.study_ceiling_lights: "off"
       light.study_lamp:
         state: "off"
 
