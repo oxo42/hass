@@ -6,6 +6,15 @@
     },
     {
       "new_item": true,
+      "item": "Node-RED",
+      "href": "https://nucker:1880/",
+      "icon": "mdi:nodejs",
+      "target": "_blank",
+      "order": 19,
+      "bottom": true
+    },
+    {
+      "new_item": true,
       "item": "ZWave-JS",
       "href": "https://nucker:8091/",
       "icon": "mdi:z-wave",
