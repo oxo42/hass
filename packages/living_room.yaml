@@ -149,6 +149,8 @@ automation:
         data:
           entity_id: media_player.kitchen_display
           volume_level: 0.8
+      - delay:
+          seconds: 2
       - service: tts.cloud_say
         data:
           entity_id: media_player.kitchen_display
@@ -157,6 +159,8 @@ automation:
             {% if is_state('sensor.garbage_recycling', '0') %}
              and the recycling
             {% endif %}
+      - delay:
+          seconds: 10
       - service: media_player.volume_set
         data:
           entity_id: media_player.kitchen_display
