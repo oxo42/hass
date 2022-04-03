@@ -58,19 +58,7 @@ automation nursery:
             data:
               hvac_mode: cool
         double_tap_off:
-          - service: switch.turn_off
-            target:
-              entity_id: switch.nursery_ceiling_lights
-          - service: light.turn_off
-            target:
-              entity_id: light.nursery_light
-          - service: script.white_noise_on_nursery_speaker
-          - service: climate.set_temperature
-            target:
-              entity_id: climate.dyson_heater
-            data:
-              temperature: 22
-              hvac_mode: heat
+          - service: script.nursery_lights_out_speaker_on
 
   - id: "1643905281363"
     alias: "Nursery: Button"
@@ -86,6 +74,9 @@ automation nursery:
               transition: 5
             target:
               entity_id: light.nursery_light
+          - service: switch.turn_off
+            target:
+              entity_id: switch.nursery_ceiling_lights
         remote_button_double_press:
           - service: light.turn_on
             data:
@@ -93,10 +84,26 @@ automation nursery:
               transition: 5
             target:
               entity_id: light.nursery_light
-        remote_button_hold_press:
-          - service: light.turn_off
-            target:
-              entity_id: light.nursery_light
           - service: switch.turn_off
             target:
               entity_id: switch.nursery_ceiling_lights
+        remote_button_hold_press:
+          - service: script.nursery_lights_out_speaker_on
+
+script:
+  nursery_lights_out_speaker_on:
+    alias: "Nursery: Lights out, white noise on"
+    sequence:
+      - service: switch.turn_off
+        target:
+          entity_id: switch.nursery_ceiling_lights
+      - service: light.turn_off
+        target:
+          entity_id: light.nursery_light
+      - service: script.white_noise_on_nursery_speaker
+      - service: climate.set_temperature
+        target:
+          entity_id: climate.dyson_heater
+        data:
+          temperature: 22
+          hvac_mode: heat

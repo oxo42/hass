@@ -62,6 +62,7 @@ automation:
 
   - id: roomba_dock
     alias: "Living Room: Dock roomba when home not empty or idle for 10 minutes"
+    condition: "{{ not is_state('vacuum.marvin', 'docked') }}"
     trigger:
       - platform: state
         entity_id: binary_sensor.home_empty
