@@ -104,6 +104,19 @@ automation:
         target:
           entity_id: switch.sink_lights
 
+  - id: sink_lights_auto_off
+    alias: "Living Room: Kitchen sink lights auto-off"
+    mode: restart
+    trigger:
+      - platform: state
+        entity_id: light.sink_lights
+        from: "off"
+        to: "on"
+        for: "00:02:00"
+    action:
+      - service: light.turn_off
+        entity_id: light.sink_lights
+
   - id: front_door_dash_set_screensaver_timeout
     alias: "Living Room: Front Door Dash - Set Screensaver Timeout"
     trigger:
