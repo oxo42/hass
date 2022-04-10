@@ -1,12 +1,4 @@
 ---
-template:
-  - sensor:
-      - name: Range Temperature F
-        # unit_of_measurement: "°F"
-        icon: mdi:thermometer
-        state: >
-          {{ (states('sensor.range_temperature_measurement') | float * 9 / 5) + 32  }}
-
 automation:
   - id: front_door_light_at_night
     alias: "Living Room: Walking around lights at night"
