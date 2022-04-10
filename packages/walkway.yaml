@@ -1,0 +1,49 @@
+---
+automation:
+  - id: "1649526423836"
+    alias: "Walkway: Lights"
+    description: Walkway and driveway lights on motion
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.walkway_sensor_motion
+      - platform: state
+        entity_id: sensor.home_state
+      - platform: homeassistant
+        event: start
+    action:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: binary_sensor.walkway_sensor_motion
+                state: "on"
+              - condition: not
+                conditions:
+                  - condition: state
+                    state: day
+                    entity_id: sensor.home_state
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id:
+                    - light.walkway_lights
+                    - light.driveway_lights
+          - conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity_id: sensor.home_state
+                    state: day
+                  - condition: state
+                    entity_id: binary_sensor.walkway_sensor_motion
+                    state: "off"
+                    for:
+                      hours: 0
+                      minutes: 5
+                      seconds: 0
+            sequence:
+              - service: light.turn_off
+                target:
+                  entity_id:
+                    - light.walkway_lights
+                    - light.driveway_lights
+    mode: restart
