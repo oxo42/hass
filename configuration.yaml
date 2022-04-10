@@ -42,8 +42,8 @@ sensor:
       - start_template: "{{ as_timestamp(state_attr('sun.sun', 'next_rising')) }}"
         end_template: "{{ as_timestamp(state_attr('sun.sun', 'next_setting')) }}"
         state: day
-      - start: "18:00"
-        end: "22:00"
+      - start: "18:00:00"
+        end: "22:00:00"
         state: evening
 
 python_script:
@@ -76,23 +76,6 @@ panel_custom:
 
 ifttt:
   key: !secret ifttt_key
-
-light:
-  - platform: switch
-    name: Garage Lights
-    entity_id: switch.garage_lights
-  - platform: switch
-    name: Nursery Ceiling Lights
-    entity_id: switch.nursery_ceiling_lights
-  - platform: switch
-    name: Ox Bedside Light
-    entity_id: switch.ox_bedside_light
-  - platform: switch
-    name: Study Ceiling Lights
-    entity_id: switch.study_ceiling_lights
-  - platform: switch
-    name: Sink Lights
-    entity_id: switch.sink_lights
 
 stream:
 camera:
