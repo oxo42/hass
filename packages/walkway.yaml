@@ -6,6 +6,11 @@ automation:
     trigger:
       - platform: state
         entity_id: binary_sensor.walkway_sensor_motion
+        to: "on"
+      - platform: state
+        entity_id: binary_sensor.walkway_sensor_motion
+        to: "off"
+        for: "00:05:00"
       - platform: state
         entity_id: sensor.home_state
       - platform: homeassistant
@@ -16,11 +21,7 @@ automation:
               - condition: state
                 entity_id: binary_sensor.walkway_sensor_motion
                 state: "on"
-              - condition: not
-                conditions:
-                  - condition: state
-                    state: day
-                    entity_id: sensor.home_state
+              - "{{ is_state('sun.sun', 'below_horizon') }}"
             sequence:
               - service: light.turn_on
                 target:
@@ -30,16 +31,10 @@ automation:
           - conditions:
               - condition: or
                 conditions:
-                  - condition: state
-                    entity_id: sensor.home_state
-                    state: day
+                  - "{{ is_state('sun.sun', 'above_horizon') }}"
                   - condition: state
                     entity_id: binary_sensor.walkway_sensor_motion
                     state: "off"
-                    for:
-                      hours: 0
-                      minutes: 5
-                      seconds: 0
             sequence:
               - service: light.turn_off
                 target:
