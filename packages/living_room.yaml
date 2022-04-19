@@ -104,7 +104,7 @@ automation:
         entity_id: light.sink_lights
         from: "off"
         to: "on"
-        for: "00:02:00"
+        for: "00:15:00"
     action:
       - service: light.turn_off
         entity_id: light.sink_lights
