@@ -1,0 +1,15 @@
+---
+automation:
+  - id: laundry_light
+    alias: "Laundry: Lights follow door"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.laundry_door_open
+    action:
+      - service: >
+          {% if is_state('binary_sensor.laundry_door_open', 'on') %}
+            light.turn_on
+          {% else %}
+            light.turn_off
+          {% endif %}
+        entity_id: light.laundry_lights
