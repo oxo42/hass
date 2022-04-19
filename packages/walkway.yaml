@@ -1,27 +1,31 @@
 ---
+template:
+  - binary_sensor:
+      - name: walkway_active
+        state: >
+          {{ 
+            is_state('binary_sensor.entrance_door_open', 'on')
+            or is_state('binary_sensor.binary_sensor.walkway_sensor_motion', 'on') 
+            or is_state('cover.garage_door', 'open') 
+          }}
+        delay_off: "00:05:00"
+
 automation:
   - id: "1649526423836"
     alias: "Walkway: Lights"
     description: Walkway and driveway lights on motion
     trigger:
       - platform: state
-        entity_id: binary_sensor.walkway_sensor_motion
-        to: "on"
-      - platform: state
-        entity_id: binary_sensor.walkway_sensor_motion
-        to: "off"
-        for: "00:05:00"
+        entity_id: binary_sensor.walkway_active
       - platform: state
         entity_id: sensor.home_state
       - platform: homeassistant
         event: start
     action:
       - choose:
-          - conditions:
-              - condition: state
-                entity_id: binary_sensor.walkway_sensor_motion
-                state: "on"
+          - conditions:  # implicit and
               - "{{ is_state('sun.sun', 'below_horizon') }}"
+              - "{{ is_state('binary_sensor.walkway_active', 'on') }}"
             sequence:
               - service: light.turn_on
                 target:
@@ -32,9 +36,7 @@ automation:
               - condition: or
                 conditions:
                   - "{{ is_state('sun.sun', 'above_horizon') }}"
-                  - condition: state
-                    entity_id: binary_sensor.walkway_sensor_motion
-                    state: "off"
+                  - "{{ is_state('binary_sensor.walkway_active', 'off') }}"
             sequence:
               - service: light.turn_off
                 target:
