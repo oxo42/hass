@@ -15,19 +15,13 @@ automation garage:
     trigger:
       - platform: state
         entity_id: binary_sensor.garage_active
-        to: "on"
     action:
-      service: light.turn_on
-      entity_id: light.garage_lights
-
-  - id: garage_lights_off
-    alias: "Garage: lights off when doors closed"
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.garage_active
-        to: "off"
-    action:
-      service: light.turn_off
+      service: >
+        {% if is_state('binary_sensor.garage_active', 'on') %}
+          light.turn_on
+        {% else %}
+          light.turn_off
+        {% endif %}
       entity_id: light.garage_lights
 
   # If you turn the lights off when you leave, the sensor won't reset for 10 minutes so the lights won't come on the next time you open the door
@@ -44,8 +38,8 @@ automation garage:
         entity_id: binary_sensor.garage_active
         state: "off"
 
-  - id: garage_door_notify_on_idle
-    alias: "Garage: Door - Notify Ox when open 30 minutes"
+  - id: garage_door_close_on_idle
+    alias: "Garage: Door - Close when no motion for 30 minutes"
     mode: restart
     trigger:
       - platform: state
@@ -53,62 +47,6 @@ automation garage:
         from: "on"
         to: "off"
         for: 00:30:00
-    condition:
-      - condition: state
-        entity_id: cover.garage_door
-        state: open
-    action:
-      - alias: "Set up variables for the actions"
-        variables:
-          # Including an id in the action allows us to identify this script run
-          # and not accidentally trigger for other notification actions
-          action_close: "{{ 'CLOSE_' ~ context.id }}"
-          action_broadcast: "{{ 'BROADCAST_' ~ context.id }}"
-      - service: notify.mobile_app_s21_ox
-        data:
-          message: Garage door open for 30 minutes
-          data:
-            actions:
-              - action: "{{ action_close }}"
-                title: "Close door"
-              - action: "{{ action_broadcast }}"
-                title: "Broadcast"
-      - alias: "Wait for a response"
-        wait_for_trigger:
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              # waiting for the specific action avoids accidentally continuing
-              # for another script/automation's notification action
-              action: "{{ action_close }}"
-          - platform: event
-            event_type: mobile_app_notification_action
-            event_data:
-              action: "{{ action_broadcast }}"
-      - alias: "Perform the action"
-        choose:
-          - conditions: "{{ wait.trigger.event.data.action == action_close }}"
-            sequence:
-              - service: cover.close_cover
-                target:
-                  entity_id: cover.garage_door
-          - conditions: "{{ wait.trigger.event.data.action == action_broadcast }}"
-            sequence:
-              - service: tts.cloud_say
-                data:
-                  entity_id: media_player.kitchen_display
-                  message: >
-                    The garage door has been left open
-
-  - id: garage_door_close_on_idle
-    alias: "Garage: Door - Close when no motion for 1 hour"
-    mode: restart
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.garage_sensor_motion
-        from: "on"
-        to: "off"
-        for: 01:00:00
     condition:
       - condition: state
         entity_id: cover.garage_door
