@@ -105,8 +105,7 @@ automation bedroom:
             type: brightness_decrease
         knock_any_side: true
         cube_knock_any:
-          - scene: scene.baby_going_to_sleep
-          - service: script.white_noise_baby_speaker
+          - service: script.good_night
         cube_shake:
           - service: media_player.media_stop
             entity_id: media_player.bedroom_speaker

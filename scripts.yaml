@@ -1,60 +1,75 @@
 babycam_kitchen:
   alias: Baby cam to kitchen
   sequence:
-    - service: media_player.play_media
-      target:
-        entity_id: media_player.kitchen_display
-      data:
-        media_content_id: http://10.0.0.2:8080/babycam.m3u8
-        media_content_type: video
-
+  - service: media_player.play_media
+    target:
+      entity_id: media_player.kitchen_display
+    data:
+      media_content_id: http://10.0.0.2:8080/babycam.m3u8
+      media_content_type: video
 babycam_study:
   alias: Baby cam to study
   sequence:
-    - service: media_player.play_media
-      target:
-        entity_id: media_player.study_display
-      data:
-        media_content_id: http://10.0.0.2:8080/babycam.m3u8
-        media_content_type: video
-
+  - service: media_player.play_media
+    target:
+      entity_id: media_player.study_display
+    data:
+      media_content_id: http://10.0.0.2:8080/babycam.m3u8
+      media_content_type: video
 close_garages:
   alias: Close Garage and Shed doors
   sequence:
-    - service: cover.close_cover
-      target:
-        entity_id:
-          - cover.garage_door
-          - cover.shed_door
-
+  - service: cover.close_cover
+    target:
+      entity_id:
+      - cover.garage_door
+      - cover.shed_door
 white_noise_baby_speaker:
   alias: Play white noise on the baby speaker in the master bedroom
   variables:
     player: media_player.bedroom_speaker
   sequence:
-    - service: media_player.volume_mute
-      data:
-        is_volume_muted: true
-        entity_id: "{{ player }}"
-    - service: media_player.play_media
-      data:
-        entity_id: "{{ player }}"
-        media_content_id: http://10.0.0.2:8123/local/white_noise_12hours.mp3
-        media_content_type: MUSIC
-    - delay:
-        seconds: 1
-    - service: media_player.volume_set
-      data:
-        entity_id: "{{ player }}"
-        volume_level: 0.6
-    - service: media_player.volume_mute
-      data:
-        is_volume_muted: false
-        entity_id: "{{ player }}"
-
+  - service: media_player.volume_mute
+    data:
+      is_volume_muted: true
+      entity_id: '{{ player }}'
+  - service: media_player.play_media
+    data:
+      entity_id: '{{ player }}'
+      media_content_id: http://10.0.0.2:8123/local/white_noise_12hours.mp3
+      media_content_type: MUSIC
+  - delay:
+      seconds: 1
+  - service: media_player.volume_set
+    data:
+      entity_id: '{{ player }}'
+      volume_level: 0.6
+  - service: media_player.volume_mute
+    data:
+      is_volume_muted: false
+      entity_id: '{{ player }}'
 white_noise_on_nursery_speaker:
   alias: White Noise on Nursery Speaker
   use_blueprint:
     path: white_noise_on_speaker.yaml
     input:
       speaker: media_player.nursery_speaker
+good_night:
+  alias: Good Night
+  sequence:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.baby_light
+      - light.deck_lights
+      - light.dining_lights
+      - light.garage_lights
+      - light.island_lights
+      - light.ox_bedside_light
+      - light.tv_light
+      - light.front_door_light
+      - light.study_lamp
+      - light.study_ceiling_lights
+  mode: restart
+  icon: mdi:sleep
