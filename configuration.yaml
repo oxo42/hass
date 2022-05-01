@@ -78,7 +78,3 @@ ifttt:
   key: !secret ifttt_key
 
 stream:
-camera:
-  - platform: generic
-    name: Garage Camera
-    stream_source: rtsp://10.42.0.4:554/live0
