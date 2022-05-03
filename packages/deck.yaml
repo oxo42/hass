@@ -1,0 +1,24 @@
+---
+template:
+  - binary_sensor:
+      - name: deck_active
+        delay_off: 00:10:00
+        state: >
+          {{  is_state('binary_sensor.deck_door_open', 'on') }}
+
+automation:
+  - id: deck_lights_on_door
+    alias: "Deck: Lights follow door"
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.deck_active
+    condition:
+      - "{{ is_state('sun.sun', 'below_horizon') }}"
+    action:
+      service: >
+        {% if is_state('binary_sensor.deck_active', 'on') %}
+          light.turn_on
+        {% else %}
+          light.turn_off
+        {% endif %}
+      entity_id: light.deck_lights
