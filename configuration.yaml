@@ -78,3 +78,10 @@ ifttt:
   key: !secret ifttt_key
 
 stream:
+
+climate:
+  - platform: midea_ac
+    host: 10.42.0.20
+    id: !secret midea_id
+    token: !secret midea_token
+    k1: !secret midea_k1
