@@ -11,7 +11,7 @@ template:
         state: >
           {{ is_state('binary_sensor.study_door_open', 'on') 
             or is_state('binary_sensor.study_sensor_motion', 'on') }}
-        delay_off: 00:05:00
+        delay_off: 00:30:00
 
 scene:
   - id: study_lights_on_day
@@ -26,7 +26,7 @@ scene:
   - id: study_lights_on_night
     name: "Study: Lights on night"
     entities:
-      light.study_ceiling_lights: "off"
+      light.study_ceiling_lights: "on"
       light.study_lamp:
         state: "on"
         brightness: 255
@@ -40,6 +40,16 @@ scene:
         state: "off"
 
 automation:
+  - id: study_ac_off_when_inactive
+    alias: "Study: AC off when inactive"
+    trigger: 
+      platform: state
+      entity_id: binary_sensor.study_active
+      to: "off"
+    action:
+      - service: climate.turn_off
+        entity_id: climate.study_ac
+
   - id: study_active
     alias: "Study: Lights on when active"
     mode: restart
