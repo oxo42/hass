@@ -6,6 +6,15 @@
     },
     {
       "new_item": true,
+      "item": "AppDaemon",
+      "href": "http://10.0.0.2:5050/",
+      "icon": "mdi:apple-keyboard-caps",
+      "target": "_blank",
+      "order": 18,
+      "bottom": true
+    },
+    {
+      "new_item": true,
       "item": "Node-RED",
       "href": "http://10.0.0.2:1880/",
       "icon": "mdi:nodejs",
