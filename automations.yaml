@@ -6,3 +6,35 @@
       dashboard: lovelace-displays
       player: media_player.kitchen_display
       view: kitchen
+- id: '1653351407013'
+  alias: 'Shed: Tag scanned'
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: c1df0752-06ad-4c20-b7c7-4a27514fef20
+  - platform: tag
+    tag_id: 5447b880-081d-4148-bd66-a3dc6ade6d7a
+  - platform: tag
+    tag_id: f518ea8a-3d21-4469-9810-73ef2eb50406
+  condition: []
+  action:
+  - service: cover.toggle
+    data: {}
+    target:
+      entity_id: cover.shed_door
+  mode: restart
+- id: '1654991000565'
+  alias: 'Garage: Tag Toggle '
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: 897479f8-e0c2-4a5f-baff-3bc9d12ebea8
+  - platform: tag
+    tag_id: 9841fc8c-7717-4333-9d98-ec96110081a9
+  condition: []
+  action:
+  - service: cover.toggle
+    data: {}
+    target:
+      entity_id: cover.garage_door
+  mode: restart
