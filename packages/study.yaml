@@ -95,14 +95,16 @@ automation:
           entity_id: cover.study_blind
 
   - id: study_blinds_open
-    alias: "Study: Blinds open at 9am"
+    alias: "Study: Blinds open in the morning"
     trigger:
       - platform: time
-        at: 09:00
+        at: 08:00
     action:
-      - service: cover.open_cover
+      - service: cover.set_cover_position
         target:
           entity_id: cover.study_blind
+        data:
+          position: 26
 
   - id: study_blind_remote_open
     alias: "Study: Blind Remote - Open"
