@@ -88,10 +88,44 @@ automation:
                 entity_id:
                   - lock.deck_door_lock
                   # Fix the door so the lock works
-                  # - lock.entrance_lock
+                  - lock.entrance_lock
       default:
         - service: lock.unlock
           target:
             entity_id:
               - lock.deck_door_lock
               - lock.entrance_lock
+
+  - id: house_climate
+    alias: "Hallway: Set climate on/off based oh presence"
+    mode: restart
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.home_empty
+      - platform: state
+        entity_id: sensor.home_state
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: 
+          - binary_sensor.deck_door_open
+          - binary_sensor.entrance_door_open
+        to: ["on", "off"]
+        for: "00:02:00"
+      - platform: state
+        entity_id: climate.hallway
+        for: "00:01:00"
+    action:
+      choose:
+        - conditions:
+            - "{{ is_state('binary_sensor.home_empty', 'off') }}"
+            - "{{ is_state('binary_sensor.deck_door_open', 'off') }}"
+            - "{{ is_state('binary_sensor.entrance_door_open', 'off') }}"
+          sequence:
+            - service: climate.turn_on
+              target:
+                entity_id: climate.hallway
+      default:
+        - service: climate.turn_off
+          target:
+            entity_id: climate.hallway

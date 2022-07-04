@@ -26,9 +26,6 @@ logger:
   #   zigpy: debug
 
 nest: !include nest.yaml
-google:
-  client_id: !secret hass_client_id
-  client_secret: !secret hass_client_secret
 
 sensor:
   - platform: time_date
