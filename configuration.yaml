@@ -25,8 +25,6 @@ logger:
   #   homeassistant.components.zha: debug
   #   zigpy: debug
 
-nest: !include nest.yaml
-
 sensor:
   - platform: time_date
     display_options:

@@ -47,10 +47,14 @@ automation:
       - platform: state
         entity_id: binary_sensor.home_empty
         to: "on"
+  condition: "{{ is_state('input_boolean.enable_marvin', 'on') }}"
     action:
       - service: vacuum.start
         target:
           entity_id: vacuum.marvin
+      - service: input_boolean.turn_off
+        target:
+          entity_id: input_boolean.enable_marvin
 
   - id: roomba_dock
     alias: "Living Room: Dock roomba when home not empty or idle for 10 minutes"
