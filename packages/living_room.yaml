@@ -47,7 +47,7 @@ automation:
       - platform: state
         entity_id: binary_sensor.home_empty
         to: "on"
-  condition: "{{ is_state('input_boolean.enable_marvin', 'on') }}"
+    condition: "{{ is_state('input_boolean.enable_marvin', 'on') }}"
     action:
       - service: vacuum.start
         target:

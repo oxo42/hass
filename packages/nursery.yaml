@@ -102,10 +102,9 @@ script:
       - service: light.turn_off
         target:
           entity_id: light.nursery_light
-      - service: script.white_noise_on_nursery_speaker
-      - service: climate.set_temperature
-        target:
-          entity_id: climate.dyson_heater
-        data:
-          temperature: 22
-          hvac_mode: heat
+      # - service: climate.set_temperature
+      #   target:
+      #     entity_id: climate.dyson_heater
+      #   data:
+      #     temperature: 22
+      #     hvac_mode: heat

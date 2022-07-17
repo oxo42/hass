@@ -80,3 +80,12 @@ climate:
     id: !secret midea_id
     token: !secret midea_token
     k1: !secret midea_k1
+
+
+plant:
+  front_door_plant:
+    sensors: 
+      moisture: sensor.plant_sensor_humidity
+      battery: sensor.plant_senssor_power
+      temperature: sensor.plant_sensor_temperature
+    min_moisture: 20
