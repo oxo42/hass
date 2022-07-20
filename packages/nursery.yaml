@@ -49,14 +49,12 @@ automation nursery:
         # switch.nursery_ceiling_lights
         device: 129bb8442ddda374f5610d8befdcfd80
         double_tap_on:
-          - service: media_player.media_stop
-            target:
-              entity_id: media_player.nursery_speaker
-          - service: climate.set_hvac_mode
-            target:
-              entity_id: climate.dyson_heater
+          - service: light.turn_on
             data:
-              hvac_mode: cool
+              brightness: 205
+              transition: 5
+            target:
+              entity_id: light.nursery_light
         double_tap_off:
           - service: script.nursery_lights_out_speaker_on
 
