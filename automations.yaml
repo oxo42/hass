@@ -38,3 +38,53 @@
     target:
       entity_id: cover.garage_door
   mode: restart
+- id: '1658850559342'
+  alias: 'Nursery: Mal''s Light to yellow in the morning'
+  description: ''
+  trigger:
+  - platform: time
+    at: 06:30:00
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      transition: 300
+      color_name: yellow
+      brightness: 3
+    target:
+      entity_id: light.mals_night_light
+  mode: single
+- id: '1659457903664'
+  alias: 'Webhook: Turn on streaming light'
+  description: ''
+  trigger:
+  - platform: webhook
+    webhook_id: webhook-turn-on-streaming-light-4kRiS9jGUFwxiYOglCzBQyWx
+  condition: []
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.streaming_light
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.study_lamp
+  mode: single
+- id: '1659472035994'
+  alias: 'Webhook: Turn off streaming light'
+  description: ''
+  trigger:
+  - platform: webhook
+    webhook_id: webhook-turn-off-streaming-light-GeOQhu9SRKUfCpBzVnOoe0r0
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.streaming_light
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.study_lamp
+  mode: single

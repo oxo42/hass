@@ -100,9 +100,25 @@ script:
       - service: light.turn_off
         target:
           entity_id: light.nursery_light
-      # - service: climate.set_temperature
-      #   target:
-      #     entity_id: climate.dyson_heater
-      #   data:
-      #     temperature: 22
-      #     hvac_mode: heat
+      - service: light.turn_on
+        entity_id: light.mals_night_light
+        data:
+          color_name: red
+          brightness: 3
+        target:
+          entity_id: light.mals_night_light
+      - service: climate.set_temperature
+        target:
+          entity_id: climate.dyson_heater
+        data:
+          temperature: 22
+          hvac_mode: heat
+# Mal's Night Light
+# service: light.turn_on
+# entity_id: light.mals_night_light
+# data:
+#   color_name: yellow
+#   brightness: 255
+#   transition: 18
+# target:
+#   entity_id: light.mals_night_light
