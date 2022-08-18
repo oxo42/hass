@@ -88,3 +88,69 @@
     target:
       entity_id: light.study_lamp
   mode: single
+- id: '1659884373089'
+  alias: 'Walkway: Open door on tag'
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: fc38b85e-c2d2-40d2-8038-cd0c1a8f4707
+  condition: []
+  action:
+  - service: lock.unlock
+    data: {}
+    target:
+      entity_id: lock.entrance_lock
+  mode: single
+- id: '1659884469367'
+  alias: 'Deck: Unlock door on tag '
+  description: ''
+  trigger:
+  - platform: tag
+    tag_id: 599d7fd2-3c51-4aea-a3e3-556fb48a22e6
+  condition: []
+  action:
+  - service: lock.unlock
+    data: {}
+    target:
+      entity_id: lock.deck_door_lock
+  mode: single
+- id: '1660078930986'
+  alias: 'Nursery: Mal''s night to red at night'
+  description: ''
+  trigger:
+  - platform: time
+    at: '18:00:00'
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      color_name: red
+      brightness: 3
+    target:
+      entity_id: light.mals_night_light
+  mode: single
+- id: '1660784236531'
+  alias: 'Closet: Wal switch light toggle'
+  description: ''
+  trigger:
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      domain: zwave_js
+      node_id: 28
+      endpoint: 0
+      device_id: 91e941c1783ff55e23ce6b2aafbdb35e
+      command_class: 91
+      command_class_name: Central Scene
+      label: Scene 001
+      property: scene
+      property_name: scene
+      property_key: '001'
+      property_key_name: '001'
+  condition: []
+  action:
+  - service: light.toggle
+    data: {}
+    target:
+      entity_id: light.closet_light
+  mode: single

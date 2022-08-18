@@ -71,5 +71,7 @@ good_night:
       - light.front_door_light
       - light.study_lamp
       - light.study_ceiling_lights
+      - light.streaming_light
+      - light.closet_light
   mode: restart
   icon: mdi:sleep

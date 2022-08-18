@@ -36,8 +36,8 @@ scene:
     name: "Study: Lights off"
     entities:
       light.study_ceiling_lights: "off"
-      light.study_lamp:
-        state: "off"
+      light.study_lamp: "off"
+      light.streaming_light: "off"
 
 automation:
   - id: study_ac_off_when_inactive
@@ -100,11 +100,9 @@ automation:
       - platform: time
         at: 08:00
     action:
-      - service: cover.set_cover_position
+      - service: cover.open_cover
         target:
           entity_id: cover.study_blind
-        data:
-          position: 26
 
   - id: study_blind_remote_open
     alias: "Study: Blind Remote - Open"

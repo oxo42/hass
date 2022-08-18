@@ -44,9 +44,9 @@ automation:
     action:
       - service: switch.turn_on
         entity_id: switch.garage_lights
-      - service: ifttt.trigger
-        data:
-          event: kettle_on
+      # - service: ifttt.trigger
+      #   data:
+      #     event: kettle_on
       - service: lock.unlock
         target:
           entity_id:
