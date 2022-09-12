@@ -33,7 +33,7 @@ notebooks/
 airsonos.xml
 themes/ios-*
 zigbee.db
-zigbee.db-journal
+zigbee.db-*
 www/white_noise_12hours.mp3
 # If needed these should be fetched from the backup
 www/community

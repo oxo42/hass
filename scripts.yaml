@@ -25,35 +25,19 @@ close_garages:
       - cover.garage_door
       - cover.shed_door
 white_noise_baby_speaker:
-  alias: Play white noise on the baby speaker in the master bedroom
-  variables:
-    player: media_player.bedroom_speaker
-  sequence:
-  - service: media_player.volume_mute
-    data:
-      is_volume_muted: true
-      entity_id: '{{ player }}'
-  - service: media_player.play_media
-    data:
-      entity_id: '{{ player }}'
-      media_content_id: http://10.0.0.2:8123/local/white_noise_12hours.mp3
-      media_content_type: MUSIC
-  - delay:
-      seconds: 1
-  - service: media_player.volume_set
-    data:
-      entity_id: '{{ player }}'
-      volume_level: 0.6
-  - service: media_player.volume_mute
-    data:
-      is_volume_muted: false
-      entity_id: '{{ player }}'
+  alias: 'Closet: White noise'
+  use_blueprint:
+    path: white_noise_on_speaker.yaml
+    input:
+      speaker: media_player.bedroom_speaker
+  mode: single
 white_noise_on_nursery_speaker:
-  alias: White Noise on Nursery Speaker
+  alias: 'Nursery: White noise'
   use_blueprint:
     path: white_noise_on_speaker.yaml
     input:
       speaker: media_player.nursery_speaker
+  mode: single
 good_night:
   alias: Good Night
   sequence:

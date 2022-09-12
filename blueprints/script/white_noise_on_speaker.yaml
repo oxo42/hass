@@ -3,7 +3,7 @@ blueprint:
   domain: script
   description: Play 12 hour white noise on designated speaker
   input:
-    speaker: 
+    speaker:
       name: Speaker to play noise on
       description: Google Hub or Chromecast device to cast to
       selector:

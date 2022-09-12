@@ -1,0 +1,86 @@
+blueprint:
+  name: ZHA - IKEA Tradfri Shortcut button
+  description: Control anything with the ikea shortcut button
+  domain: automation
+  input:
+    shortcut_button:
+      name: Device
+      description: Select an IKEA shortcut button
+      selector:
+        device:
+          integration: zha
+          manufacturer: IKEA of Sweden
+          model: TRADFRI SHORTCUT Button
+          multiple: false
+    button_short:
+      name: Single click
+      description: 'Choose action(s) when short pressed:'
+      default: []
+      selector:
+        action: {}
+    button_double:
+      name: Double click
+      description: 'Choose action(s) when double pressed:'
+      default: []
+      selector:
+        action: {}
+    button_long:
+      name: Long click
+      description: 'Choose action(s) when long pressed:'
+      default: []
+      selector:
+        action: {}
+  source_url: https://community.home-assistant.io/t/zha-ikea-tradfri-shortcut-button/261936
+mode: single
+max_exceeded: silent
+trigger:
+- platform: event
+  event_type: zha_event
+  event_data:
+    device_id: !input shortcut_button
+action:
+- variables:
+    command: '{{ trigger.event.data.command }}'
+    cluster_id: '{{ trigger.event.data.cluster_id }}'
+    endpoint_id: '{{ trigger.event.data.endpoint_id }}'
+    args: '{{ trigger.event.data.args }}'
+- choose:
+  - conditions:
+    - '{{ endpoint_id == 1 }}'
+    - '{{ cluster_id == 6 }}'
+    - '{{ command == ''on'' }}'
+    sequence:
+    - wait_for_trigger:
+      - platform: event
+        event_type: zha_event
+        event_data:
+          device_id: !input shortcut_button
+          endpoint_id: 1
+          cluster_id: 6
+          command: 'on'
+      timeout:
+        milliseconds: 600
+      continue_on_timeout: true
+    - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{ not wait.trigger }}'
+        sequence: !input button_short
+      default: !input button_double
+  - conditions:
+    - '{{ endpoint_id == 1 }}'
+    - '{{ cluster_id == 8 }}'
+    - '{{ command == ''move_with_on_off'' }}'
+    sequence:
+    - choose:
+      default: !input button_long
+    - wait_for_trigger:
+      - platform: event
+        event_type: zha_event
+        event_data:
+          device_id: !input shortcut_button
+          endpoint_id: 1
+          cluster_id: 8
+          command: stop
+      timeout:
+        seconds: 10

@@ -154,3 +154,18 @@
     target:
       entity_id: light.closet_light
   mode: single
+- id: '1661883340983'
+  alias: 'Closet: Button'
+  description: ''
+  use_blueprint:
+    path: mcflexus/zha-ikea-tradfri-shortcut-button.yaml
+    input:
+      shortcut_button: b08b8001288481889aab20273ea044c6
+      button_short:
+      - service: light.toggle
+        data: {}
+        target:
+          entity_id: light.closet_light
+      button_long:
+      - service: script.white_noise_baby_speaker
+        data: {}
