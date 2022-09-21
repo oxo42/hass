@@ -40,24 +40,6 @@ automation nursery:
         data:
           preset_mode: Auto
 
-  - id: "1642893483187"
-    alias: "Nursery: Ceiling Light Double Taps"
-    description: ""
-    use_blueprint:
-      path: kpine/ge_double.yaml
-      input:
-        # switch.nursery_ceiling_lights
-        device: 129bb8442ddda374f5610d8befdcfd80
-        double_tap_on:
-          - service: light.turn_on
-            data:
-              brightness: 205
-              transition: 5
-            target:
-              entity_id: light.nursery_light
-        double_tap_off:
-          - service: script.nursery_lights_out_speaker_on
-
   - id: "1643905281363"
     alias: "Nursery: Button"
     use_blueprint:
@@ -73,9 +55,9 @@ automation nursery:
             target:
               entity_id: light.nursery_light
           - delay: 5
-          - service: switch.turn_off
+          - service: light.turn_off
             target:
-              entity_id: switch.nursery_ceiling_lights
+              entity_id: light.nursery_ceiling
         remote_button_double_press:
           - service: light.turn_on
             data:
@@ -84,9 +66,9 @@ automation nursery:
             target:
               entity_id: light.nursery_light
           - delay: 5
-          - service: switch.turn_off
+          - service: light.turn_off
             target:
-              entity_id: switch.nursery_ceiling_lights
+              entity_id: light.nursery_ceiling
         remote_button_hold_press:
           - service: script.nursery_lights_out_speaker_on
 
@@ -94,9 +76,9 @@ script:
   nursery_lights_out_speaker_on:
     alias: "Nursery: Lights out, white noise on"
     sequence:
-      - service: switch.turn_off
+      - service: light.turn_off
         target:
-          entity_id: switch.nursery_ceiling_lights
+          entity_id: light.nursery_ceiling
       - service: light.turn_off
         target:
           entity_id: light.nursery_light

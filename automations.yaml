@@ -169,3 +169,148 @@
       button_long:
       - service: script.white_noise_baby_speaker
         data: {}
+- id: house_climate
+  alias: 'Hallway: Set climate on/off based oh presence'
+  mode: restart
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.home_empty
+  - platform: state
+    entity_id: sensor.home_state
+  - platform: homeassistant
+    event: start
+  - platform: state
+    entity_id:
+    - binary_sensor.deck_door_open
+    - binary_sensor.entrance_door_open
+    to:
+    - 'on'
+    - 'off'
+    for: 00:02:00
+  - platform: state
+    entity_id: climate.hallway
+    for: 00:01:00
+  action:
+    choose:
+    - conditions:
+      - '{{ is_state(''binary_sensor.home_empty'', ''off'') }}'
+      - '{{ is_state(''binary_sensor.deck_door_open'', ''off'') }}'
+      - '{{ is_state(''binary_sensor.entrance_door_open'', ''off'') }}'
+      sequence:
+      - service: climate.turn_on
+        target:
+          entity_id: climate.hallway
+    default:
+    - service: climate.turn_off
+      target:
+        entity_id: climate.hallway
+- id: '1663375318846'
+  alias: 'Nursery: Open/Close Blinds'
+  description: ''
+  use_blueprint:
+    path: r3mcos3/ikea_open_close_remote.yaml
+    input:
+      remote: 8252a3a532e64de7f650e0209a8d6dc3
+      cover: cover.nursery_blind
+- id: '1663712608795'
+  alias: 'Study: Blind Open/Close'
+  description: ''
+  use_blueprint:
+    path: r3mcos3/ikea_open_close_remote.yaml
+    input:
+      remote: 96acb7fe9be494fddeeba65997db51a1
+      cover: cover.study_blind
+- id: '1663713505830'
+  alias: 'Study: Occupancy'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.study_occupancy
+  condition:
+  - condition: state
+    entity_id: input_boolean.study_guest_present
+    state: 'off'
+  action:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.study_occupancy
+        state: 'on'
+      sequence:
+      - service: switch.turn_off
+        data: {}
+        target:
+          entity_id: switch.study_dash_screensaver
+      - service: light.turn_on
+        data: {}
+        target:
+          entity_id:
+          - light.study_ceiling_lights
+          - light.study_lamp
+          - light.streaming_light
+      - service: number.set_value
+        data:
+          value: '7200'
+        target:
+          entity_id: number.study_dash_screensaver_timer
+    default:
+    - service: switch.turn_on
+      data: {}
+      target:
+        entity_id: switch.study_dash_screensaver
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id:
+        - light.study_ceiling_lights
+        - light.study_lamp
+        - light.streaming_light
+    - service: number.set_value
+      data:
+        value: '1'
+      target:
+        entity_id: number.study_dash_screensaver_timer
+  mode: single
+
+- id: study_ac_off_when_inactive
+  alias: "Study: AC off when inactive"
+  trigger:e
+    platform: state
+    entity_id: binary_sensor.study_occupancy
+    to: "off"
+  action:
+    - service: climate.turn_off
+      entity_id: climate.study_ac
+
+- id: study_blinds_shut
+  alias: "Study: Blinds shut at sunset"
+  trigger:
+    - platform: sun
+      event: sunset
+  action:
+    - service: cover.close_cover
+      target:
+        entity_id: cover.study_blind
+
+- id: study_blinds_open
+  alias: "Study: Blinds open in the morning"
+  trigger:
+    - platform: time
+      at: 08:00
+  action:
+    - service: cover.open_cover
+      target:
+        entity_id: cover.study_blind
+
+- id: "1644372711313"
+  alias: "Study: Double Tap Switch"
+  use_blueprint:
+    path: kpine/ge_double.yaml
+    input:
+      # switch.study_lights
+      device: 771312246077ff9c4bb264b87f9778f7
+      double_tap_on:
+        - scene: scene.study_lights_on_day
+      double_tap_off:
+        - scene: scene.study_lights_off
