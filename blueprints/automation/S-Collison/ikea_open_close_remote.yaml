@@ -20,12 +20,12 @@ blueprint:
           multiple: false
     cover:
       name: Roller Blind
-      description: Roller blind to control
+      description: Roller blinds to control
       selector:
-        entity:
-          domain: cover
-          multiple: false
-  source_url: https://gist.github.com/r3mcos3/9534b849339e0558ca70ac5295238893
+        target:
+          entity:
+            domain: cover
+  source_url: https://gist.github.com/S-Collison/3f7da1cfb6070ba0c5641dd5c4f2d54d
 mode: single
 max_exceeded: silent
 trigger:
@@ -41,9 +41,9 @@ action:
     - '{{ command == ''up_open'' }}'
     sequence:
     - service: cover.open_cover
-      entity_id: !input cover
+      target: !input cover
   - conditions:
     - '{{ command == ''down_close'' }}'
     sequence:
     - service: cover.close_cover
-      entity_id: !input cover
+      target: !input cover

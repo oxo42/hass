@@ -48,32 +48,6 @@ automation bedroom:
         target:
           area_id: bedroom
 
-  - id: bedroom_blind_remote_open
-    alias: "Bedroom: Blind Remote - Open"
-    trigger:
-      - device_id: 5227e002c9b20a4248fdd6f793186735
-        domain: zha
-        platform: device
-        type: remote_button_short_press
-        subtype: open
-    action:
-      - service: cover.open_cover
-        target:
-          area_id: bedroom
-
-  - id: bedroom_blind_remote_close
-    alias: "Bedroom: Blind Remote - Close"
-    trigger:
-      - device_id: 5227e002c9b20a4248fdd6f793186735
-        domain: zha
-        platform: device
-        type: remote_button_short_press
-        subtype: close
-    action:
-      - service: cover.close_cover
-        target:
-          area_id: bedroom
-
   - id: "1642637909283"
     alias: "Bedroom: Magic Cube Automation"
     description: ""
