@@ -34,10 +34,10 @@ sensor:
     default_state: day
     events:
       - state: night
-      - start_template: "{{ as_timestamp(state_attr('sun.sun', 'next_rising')) }}"
+      - start: "06:00:00"
         end_template: "{{ as_timestamp(state_attr('sun.sun', 'next_setting')) }}"
         state: day
-      - start: "18:00:00"
+      - start_template: "{{ as_timestamp(state_attr('sun.sun', 'next_setting')) }}"
         end: "22:00:00"
         state: evening
 

@@ -169,7 +169,7 @@
       button_long:
       - service: script.white_noise_baby_speaker
         data: {}
-- id: house_climate
+- id: house_climate_on_presence
   alias: 'Hallway: Set climate on/off based on presence'
   description: ''
   trigger:
@@ -228,6 +228,11 @@
         entity_id: binary_sensor.study_occupancy
         state: 'on'
       sequence:
+      - service: number.set_value
+        data:
+          value: '7200'
+        target:
+          entity_id: number.study_dash_screensaver_timer
       - service: switch.turn_off
         data: {}
         target:
@@ -239,11 +244,6 @@
           - light.study_ceiling_lights
           - light.study_lamp
           - light.streaming_light
-      - service: number.set_value
-        data:
-          value: '7200'
-        target:
-          entity_id: number.study_dash_screensaver_timer
     default:
     - service: switch.turn_on
       data: {}
@@ -329,3 +329,188 @@
         - cover.bedroom_blind_left
         - cover.bedroom_blind_center_window_covering
         - cover.bedroom_blind_right
+- id: someone_is_coming_home
+  alias: 'Home: Someone is coming home'
+  trigger:
+    platform: zone
+    entity_id:
+    - person.ox
+    - person.sue
+    - person.callie
+    zone: zone.home
+    event: enter
+  action:
+  - service: switch.turn_on
+    entity_id: switch.garage_lights
+  - service: lock.unlock
+    target:
+      entity_id:
+      - lock.deck_door_lock
+      - lock.entrance_lock
+- id: house_locks
+  alias: 'Living Room: Set locks to correct state'
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.home_empty
+  - platform: state
+    entity_id: sensor.home_state
+  - platform: homeassistant
+    event: start
+  - platform: state
+    entity_id:
+    - lock.deck_door_lock
+    from: locked
+    to: unlocked
+    for: 00:15:00
+  action:
+  - choose:
+    - alias: Lock house
+      conditions:
+      - condition: or
+        conditions:
+        - '{{ is_state(''binary_sensor.home_empty'', ''on'') }}'
+        - '{{ is_state(''sensor.home_state'', ''night'') }}'
+      sequence:
+      - service: lock.lock
+        target:
+          entity_id:
+          - lock.deck_door_lock
+          - lock.entrance_lock
+        data: {}
+    default:
+    - service: lock.unlock
+      target:
+        entity_id:
+        - lock.deck_door_lock
+        - lock.entrance_lock
+      data: {}
+- id: '1665792421763'
+  alias: 'Nursery: Scene TL: Toggle Blinds'
+  description: Double tap toggle blinds
+  trigger:
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      domain: zwave_js
+      device_id: 15d84c77fe7d0af006dbf319e0c281e5
+      command_class_name: Central Scene
+      label: Scene 001
+      value: KeyPressed2x
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      brightness_pct: 81
+    target:
+      entity_id: light.nursery_light
+  mode: single
+- id: '1665792534882'
+  alias: 'Nursery: Scene TR: Day Mode'
+  description: Set day mode
+  trigger:
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      domain: zwave_js
+      device_id: 15d84c77fe7d0af006dbf319e0c281e5
+      command_class_name: Central Scene
+      label: Scene 002
+      value: KeyPressed2x
+  condition: []
+  action:
+  - service: cover.open_cover
+    data: {}
+    target:
+      entity_id: cover.nursery_blind
+  - service: light.turn_on
+    data:
+      color_name: yellow
+      brightness: 1
+    target:
+      entity_id: light.mals_night_light
+  - service: light.turn_on
+    data:
+      brightness: 192
+    target:
+      entity_id:
+      - light.nursery_ceiling
+      - light.nursery_light
+  - service: climate.set_hvac_mode
+    data:
+      hvac_mode: cool
+    target:
+      entity_id: climate.dyson_heater
+  mode: single
+- id: '1665792617206'
+  alias: 'Nursery: Scene BR: Night mode'
+  description: Turn on night mode for wall scene controller
+  trigger:
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      domain: zwave_js
+      device_id: 15d84c77fe7d0af006dbf319e0c281e5
+      command_class_name: Central Scene
+      label: Scene 004
+      value: KeyPressed2x
+  condition: []
+  action:
+  - service: script.nursery_lights_out_speaker_on
+    data: {}
+  - service: cover.close_cover
+    data: {}
+    target:
+      entity_id: cover.nursery_blind
+  mode: single
+- id: '1665849187744'
+  alias: 'Nursery: Scene Center: Lights off'
+  description: Turn off lights
+  trigger:
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      domain: zwave_js
+      device_id: 15d84c77fe7d0af006dbf319e0c281e5
+      command_class_name: Central Scene
+      label: Scene 005
+      value: KeyPressed2x
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.nursery_light
+      - light.nursery_ceiling
+      - light.mals_night_light
+  mode: single
+- id: '1669485973281'
+  alias: 'Driveway: Lights on at night'
+  description: ''
+  trigger:
+  - platform: homeassistant
+    event: start
+  - platform: sun
+    event: sunset
+    offset: 0
+  - platform: state
+    entity_id:
+    - sensor.home_state
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: sensor.home_state
+        state: evening
+      sequence:
+      - service: light.turn_on
+        data: {}
+        target:
+          entity_id: light.outside_lights
+    default:
+    - service: light.turn_off
+      data: {}
+      target:
+        entity_id: light.outside_lights
+  mode: single
