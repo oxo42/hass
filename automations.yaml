@@ -344,8 +344,8 @@
         - lock.entrance_lock
       data: {}
 - id: '1665792421763'
-  alias: 'Nursery: Scene TL: Toggle Blinds'
-  description: Double tap toggle blinds
+  alias: 'Nursery: Scene TL: Lamp bright'
+  description: Ceiling off
   trigger:
   - platform: event
     event_type: zwave_js_value_notification
@@ -354,7 +354,7 @@
       device_id: 15d84c77fe7d0af006dbf319e0c281e5
       command_class_name: Central Scene
       label: Scene 001
-      value: KeyPressed2x
+      value: KeyPressed
   condition: []
   action:
   - service: light.turn_on
@@ -364,8 +364,7 @@
       entity_id: light.nursery_light
   mode: single
 - id: '1665792534882'
-  alias: 'Nursery: Scene TR: Day Mode'
-  description: Set day mode
+  alias: 'Nursery: Scene TR: Lamp dim'
   trigger:
   - platform: event
     event_type: zwave_js_value_notification
@@ -374,31 +373,14 @@
       device_id: 15d84c77fe7d0af006dbf319e0c281e5
       command_class_name: Central Scene
       label: Scene 002
-      value: KeyPressed2x
+      value: KeyPressed
   condition: []
   action:
-  - service: cover.open_cover
-    data: {}
-    target:
-      entity_id: cover.nursery_blind
   - service: light.turn_on
     data:
-      color_name: yellow
-      brightness: 1
+      brightness_pct: 1
     target:
-      entity_id: light.mals_night_light
-  - service: light.turn_on
-    data:
-      brightness: 192
-    target:
-      entity_id:
-      - light.nursery_ceiling
-      - light.nursery_light
-  - service: climate.set_hvac_mode
-    data:
-      hvac_mode: cool
-    target:
-      entity_id: climate.dyson_heater
+      entity_id: light.nursery_light
   mode: single
 - id: '1665792617206'
   alias: 'Nursery: Scene BR: Night mode'
@@ -518,3 +500,122 @@
       target:
         entity_id: climate.hallway
   mode: restart
+- id: '1674322593990'
+  alias: 'Living Room: Start roomba when home empty'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.home_empty
+    to: 'on'
+  - platform: template
+    value_template: '{{ states(''sensor.marvin_battery_level'') | int >  70 }}'
+  condition:
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: binary_sensor.home_empty
+      state: 'on'
+    - condition: state
+      entity_id: input_boolean.enable_marvin
+      state: 'on'
+  action:
+  - service: vacuum.start
+    target:
+      entity_id: vacuum.marvin
+    data: {}
+  - service: input_boolean.turn_off
+    target:
+      entity_id: input_boolean.enable_marvin
+    data: {}
+  mode: single
+- id: '1675789562876'
+  alias: 'Nursery: Button'
+  description: ''
+  trigger:
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: 0ddde75b7640155de09f558fb4942612
+  condition: []
+  action:
+  - variables:
+      press_type: '{{ trigger.event.data.args.press_type }}'
+  - choose:
+    - conditions:
+      - '{{ press_type == ''single'' }}'
+      sequence:
+      - service: light.turn_on
+        data:
+          brightness: 3
+          transition: 5
+        target:
+          entity_id: light.nursery_light
+      - delay: 5
+      - service: light.turn_off
+        target:
+          entity_id: light.nursery_ceiling
+        data: {}
+    - conditions:
+      - '{{ press_type == ''double'' }}'
+      sequence:
+      - service: light.turn_on
+        data:
+          brightness: 205
+          transition: 5
+        target:
+          entity_id: light.nursery_light
+      - delay: 5
+      - service: light.turn_off
+        target:
+          entity_id: light.nursery_ceiling
+        data: {}
+    - conditions:
+      - '{{ press_type == ''hold'' }}'
+      sequence:
+      - service: script.nursery_lights_out_white_noise_on
+        data: {}
+  mode: restart
+  max_exceeded: silent
+- id: '1675789633752'
+  alias: 'Nursery: heat at night'
+  description: ''
+  trigger:
+  - platform: time
+    at: '18:00'
+  condition: []
+  action:
+  - service: climate.turn_on
+    target:
+      entity_id: climate.dyson_heater
+    data: {}
+  - service: climate.set_temperature
+    target:
+      entity_id: climate.dyson_heater
+    data:
+      temperature: 22
+      hvac_mode: heat
+  - service: fan.set_preset_mode
+    target:
+      entity_id: fan.dyson_heater
+    data:
+      preset_mode: Auto
+  mode: single
+- id: '1675789645847'
+  alias: 'Nursery: cool during the day'
+  description: ''
+  trigger:
+  - platform: time
+    at: 06:00
+  condition: []
+  action:
+  - service: climate.set_hvac_mode
+    target:
+      entity_id: climate.dyson_heater
+    data:
+      hvac_mode: cool
+  - service: fan.set_preset_mode
+    target:
+      entity_id: fan.dyson_heater
+    data:
+      preset_mode: Auto
+  mode: single
