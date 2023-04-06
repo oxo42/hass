@@ -41,23 +41,6 @@ automation:
       service: light.turn_off
       entity_id: light.front_door_light
 
-  - id: roomba_dock
-    alias: "Living Room: Dock roomba when home not empty or idle for 10 minutes"
-    condition: "{{ not is_state('vacuum.marvin', 'docked') }}"
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.home_empty
-        from: "on"
-        to: "off"
-      - platform: state
-        entity_id: vacuum.marvin
-        to: "idle"
-        for: "00:10:00"
-    action:
-      - service: vacuum.return_to_base
-        target:
-          entity_id: vacuum.marvin
-
   - id: sink_lights_on_motion
     alias: "Living Room: Kitchen sink lights on motion"
     mode: restart

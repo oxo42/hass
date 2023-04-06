@@ -619,3 +619,23 @@
     data:
       preset_mode: Auto
   mode: single
+- id: '1680795731179'
+  alias: 'Living Room: Dock roomba when home not empty or idle for 10 minutes'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.home_empty
+    from: 'on'
+    to: 'off'
+  - platform: state
+    entity_id: vacuum.marvin
+    to: idle
+    for: 00:10:00
+  condition:
+  - '{{ not is_state(''vacuum.marvin'', ''docked'') }}'
+  action:
+  - service: vacuum.return_to_base
+    target:
+      entity_id: vacuum.marvin
+    data: {}
+  mode: single
