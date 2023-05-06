@@ -51,12 +51,20 @@ good_night:
       - light.garage_lights
       - light.island_lights
       - light.ox_bedside_light
-      - light.tv_light
       - light.front_door_light
       - light.study_lamp
       - light.study_ceiling_lights
       - light.streaming_light
       - light.closet_light
+      - light.kitchen_lights
+      - light.living_room_lights
+      - light.entrance_lights
+      - light.sink_lights
+      - light.laundry_lights
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.mudroom_lights
   mode: restart
   icon: mdi:sleep
 nursery_lights_out_white_noise_on:
@@ -84,3 +92,88 @@ nursery_lights_out_white_noise_on:
       temperature: 22
       hvac_mode: heat
   mode: single
+boil_kettle:
+  alias: Boil Kettle
+  sequence:
+  - service: ifttt.trigger
+    data:
+      event: kettle_on
+  mode: single
+  icon: mdi:kettle
+doors_lock:
+  alias: 'Doors: Lock'
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.entrance_door_open
+        state: 'off'
+      - condition: state
+        entity_id: lock.entrance_lock
+        state: unlocked
+      sequence:
+      - service: lock.lock
+        data: {}
+        target:
+          entity_id: lock.entrance_lock
+  - choose:
+    - conditions:
+      - condition: state
+        state: 'off'
+        entity_id: binary_sensor.deck_door_open
+      - condition: state
+        entity_id: lock.deck_door_lock
+        state: unlocked
+      sequence:
+      - service: lock.lock
+        data: {}
+        target:
+          entity_id:
+          - lock.deck_door_lock
+  mode: single
+  icon: mdi:door-closed-lock
+doors_unlock:
+  alias: 'Doors: Unlock'
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: lock.entrance_lock
+        state: locked
+      sequence:
+      - service: lock.unlock
+        data: {}
+        target:
+          entity_id: lock.entrance_lock
+  - choose:
+    - conditions:
+      - condition: state
+        state: locked
+        entity_id: lock.deck_door_lock
+      sequence:
+      - service: lock.unlock
+        data: {}
+        target:
+          entity_id: lock.deck_door_lock
+  mode: single
+  icon: mdi:door-open
+study_toggle_ac:
+  alias: 'Study: Toggle AC'
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: climate.study_ac
+        state: 'off'
+      sequence:
+      - service: climate.turn_on
+        data: {}
+        target:
+          entity_id: climate.study_ac
+    default:
+    - service: climate.turn_off
+      data: {}
+      target:
+        entity_id: climate.study_ac
+  mode: single
+  icon: mdi:air-conditioner

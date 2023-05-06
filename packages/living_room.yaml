@@ -41,46 +41,6 @@ automation:
       service: light.turn_off
       entity_id: light.front_door_light
 
-  - id: sink_lights_on_motion
-    alias: "Living Room: Kitchen sink lights on motion"
-    mode: restart
-    condition: "{{ not is_state('sensor.home_state', 'night') }}"
-    trigger:
-      platform: state
-      entity_id: binary_sensor.kitchen_sink_motion
-      from: "off"
-      to: "on"
-    action:
-      - alias: "Turn on the light"
-        service: switch.turn_on
-        target:
-          entity_id: switch.sink_lights
-      - alias: "Wait until there is no motion from device"
-        wait_for_trigger:
-          platform: state
-          entity_id: binary_sensor.kitchen_sink_motion
-          from: "on"
-          to: "off"
-      - alias: "Wait the number of seconds that has been set"
-        delay: 60
-      - alias: "Turn off the light"
-        service: switch.turn_off
-        target:
-          entity_id: switch.sink_lights
-
-  - id: sink_lights_auto_off
-    alias: "Living Room: Kitchen sink lights auto-off"
-    mode: restart
-    trigger:
-      - platform: state
-        entity_id: light.sink_lights
-        from: "off"
-        to: "on"
-        for: "00:15:00"
-    action:
-      - service: light.turn_off
-        entity_id: light.sink_lights
-
   - id: front_door_dash_set_screensaver_timeout
     alias: "Living Room: Front Door Dash - Set Screensaver Timeout"
     trigger:
