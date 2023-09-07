@@ -72,11 +72,10 @@ nursery_lights_out_white_noise_on:
   sequence:
   - service: light.turn_off
     target:
-      entity_id: light.nursery_ceiling
-    data: {}
-  - service: light.turn_off
-    target:
-      entity_id: light.nursery_light
+      entity_id:
+      - light.nursery_ceiling
+      - light.kids_closet_lights
+      - light.nursery_lamp
     data: {}
   - service: light.turn_on
     entity_id: light.mals_night_light
@@ -177,3 +176,20 @@ study_toggle_ac:
         entity_id: climate.study_ac
   mode: single
   icon: mdi:air-conditioner
+watching_tv:
+  alias: 'Watching TV '
+  sequence:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.living_room_lights
+      - light.island_lights
+      - light.dining_lights
+      - light.entrance_lights
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.mudroom_lights
+  mode: single
+  icon: mdi:television

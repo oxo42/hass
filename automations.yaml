@@ -1,11 +1,3 @@
-- id: '1640723847855'
-  alias: Cast dash to Kitchen Display
-  use_blueprint:
-    path: kind3r/cast-and-re-cast-a-lovelace-view-to-a-google-hub.yaml
-    input:
-      dashboard: lovelace-displays
-      player: media_player.kitchen_display
-      view: kitchen
 - id: '1653351407013'
   alias: 'Shed: Tag scanned'
   description: ''
@@ -53,40 +45,6 @@
       brightness: 3
     target:
       entity_id: light.mals_night_light
-  mode: single
-- id: '1659457903664'
-  alias: 'Webhook: Turn on streaming light'
-  description: ''
-  trigger:
-  - platform: webhook
-    webhook_id: webhook-turn-on-streaming-light-4kRiS9jGUFwxiYOglCzBQyWx
-  condition: []
-  action:
-  - service: light.turn_on
-    data: {}
-    target:
-      entity_id: light.streaming_light
-  - service: light.turn_off
-    data: {}
-    target:
-      entity_id: light.study_lamp
-  mode: single
-- id: '1659472035994'
-  alias: 'Webhook: Turn off streaming light'
-  description: ''
-  trigger:
-  - platform: webhook
-    webhook_id: webhook-turn-off-streaming-light-GeOQhu9SRKUfCpBzVnOoe0r0
-  condition: []
-  action:
-  - service: light.turn_off
-    data: {}
-    target:
-      entity_id: light.streaming_light
-  - service: light.turn_on
-    data: {}
-    target:
-      entity_id: light.study_lamp
   mode: single
 - id: '1659884373089'
   alias: 'Walkway: Open door on tag'
@@ -154,21 +112,6 @@
     target:
       entity_id: light.closet_light
   mode: single
-- id: '1661883340983'
-  alias: 'Closet: Button'
-  description: ''
-  use_blueprint:
-    path: mcflexus/zha-ikea-tradfri-shortcut-button.yaml
-    input:
-      shortcut_button: b08b8001288481889aab20273ea044c6
-      button_short:
-      - service: light.toggle
-        data: {}
-        target:
-          entity_id: light.closet_light
-      button_long:
-      - service: script.white_noise_baby_speaker
-        data: {}
 - id: '1663713505830'
   alias: 'Study: Occupancy'
   description: ''
@@ -187,27 +130,14 @@
         entity_id: binary_sensor.study_occupancy
         state: 'on'
       sequence:
-      - service: number.set_value
-        data:
-          value: '7200'
-        target:
-          entity_id: number.study_dash_screensaver_timer
-      - service: switch.turn_off
-        data: {}
-        target:
-          entity_id: switch.study_dash_screensaver
       - service: light.turn_on
         data: {}
         target:
           entity_id:
           - light.study_ceiling_lights
-          - light.study_lamp
           - light.streaming_light
+          - light.study_lamp
     default:
-    - service: switch.turn_on
-      data: {}
-      target:
-        entity_id: switch.study_dash_screensaver
     - service: light.turn_off
       data: {}
       target:
@@ -215,21 +145,16 @@
         - light.study_ceiling_lights
         - light.study_lamp
         - light.streaming_light
-    - service: number.set_value
-      data:
-        value: '1'
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: climate.study_ac
+        state: 'off'
+    - service: climate.turn_off
+      data: {}
       target:
-        entity_id: number.study_dash_screensaver_timer
-  mode: single
-- id: study_ac_off_when_inactive
-  alias: 'Study: AC off when inactive'
-  trigger:
-    platform: state
-    entity_id: binary_sensor.study_occupancy
-    to: 'off'
-  action:
-  - service: climate.turn_off
-    entity_id: climate.study_ac
+        entity_id: climate.study_ac
+  mode: restart
 - id: study_blinds_shut
   alias: 'Study: Blinds shut at sunset'
   trigger:
@@ -258,6 +183,10 @@
       - scene: scene.study_lights_on_day
       double_tap_off:
       - scene: scene.study_lights_off
+      - service: climate.turn_off
+        data: {}
+        target:
+          entity_id: climate.study_ac
 - id: '1663779432861'
   alias: 'Study: Blind Open/Close'
   description: ''
@@ -276,18 +205,6 @@
       remote: 8252a3a532e64de7f650e0209a8d6dc3
       cover:
         entity_id: cover.nursery_blind
-- id: '1663779650573'
-  alias: 'Bedroom: Blinds Open/Close'
-  description: ''
-  use_blueprint:
-    path: S-Collison/ikea_open_close_remote.yaml
-    input:
-      remote: 5227e002c9b20a4248fdd6f793186735
-      cover:
-        entity_id:
-        - cover.bedroom_blind_left
-        - cover.bedroom_blind_center_window_covering
-        - cover.bedroom_blind_right
 - id: someone_is_coming_home
   alias: 'Home: Someone is coming home'
   trigger:
@@ -304,6 +221,7 @@
   - service: ifttt.trigger
     data:
       event: kettle_on
+    enabled: false
   - service: script.doors_unlock
     data: {}
 - id: house_locks
@@ -353,7 +271,7 @@
     data:
       brightness_pct: 81
     target:
-      entity_id: light.nursery_light
+      entity_id: light.nursery_lamp
   mode: single
 - id: '1665792534882'
   alias: 'Nursery: Scene TR: Lamp dim'
@@ -372,7 +290,7 @@
     data:
       brightness_pct: 1
     target:
-      entity_id: light.nursery_light
+      entity_id: light.nursery_lamp
   mode: single
 - id: '1665792617206'
   alias: 'Nursery: Scene BR: Night mode'
@@ -392,8 +310,13 @@
     data: {}
     target:
       entity_id: cover.nursery_blind
-  - service: script.nursery_lights_out_white_noise_on
+  - service: light.turn_off
     data: {}
+    target:
+      entity_id:
+      - light.nursery_ceiling
+      - light.kids_closet_lights
+      - light.nursery_lamp
   mode: single
 - id: '1665849187744'
   alias: 'Nursery: Scene Center: Lights off'
@@ -413,9 +336,10 @@
     data: {}
     target:
       entity_id:
-      - light.nursery_light
       - light.nursery_ceiling
       - light.mals_night_light
+      - light.kids_closet_lights
+      - light.nursery_lamp
   mode: single
 - id: '1669485973281'
   alias: 'Driveway: Lights on at night'
@@ -541,7 +465,8 @@
           brightness: 3
           transition: 5
         target:
-          entity_id: light.nursery_light
+          entity_id:
+          - light.nursery_lamp
       - delay: 5
       - service: light.turn_off
         target:
@@ -555,7 +480,7 @@
           brightness: 205
           transition: 5
         target:
-          entity_id: light.nursery_light
+          entity_id: light.nursery_lamp
       - delay: 5
       - service: light.turn_off
         target:
@@ -656,8 +581,8 @@
       entity_id: cover.study_blind
   mode: restart
 - id: '1682905700800'
-  alias: 'Nursery: Scene BL: Lights Out'
-  description: Turn off lights
+  alias: 'Nursery: Scene BL: Closet Light'
+  description: Toggle closet light
   trigger:
   - platform: event
     event_type: zwave_js_value_notification
@@ -669,13 +594,10 @@
       value: KeyPressed
   condition: []
   action:
-  - service: light.turn_off
+  - service: light.toggle
     data: {}
     target:
-      entity_id:
-      - light.nursery_light
-      - light.nursery_ceiling
-      - light.mals_night_light
+      entity_id: light.kids_closet_lights
   mode: single
 - id: '1683313563010'
   alias: 'Living Room: Kitchen sink lights on motion'
@@ -688,11 +610,11 @@
   condition:
   - '{{ not is_state(''sensor.home_state'', ''night'') }}'
   action:
-  - alias: Turn on the light
-    service: switch.turn_on
+  - service: light.turn_on
+    data:
+      brightness_pct: 99
     target:
-      entity_id: switch.sink_lights
-    data: {}
+      entity_id: light.sink_lights
   - alias: Wait until there is no motion from device
     wait_for_trigger:
       platform: state
@@ -707,3 +629,268 @@
       entity_id: switch.sink_lights
     data: {}
   mode: restart
+- id: '1683676421024'
+  alias: 'Living Room: Morning'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.home_state
+    to: day
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.mudroom_lights
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.kitchen_lights
+  mode: single
+- id: '1684083172008'
+  alias: 'Living Room: Walking around lights at night'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.landing_sensor_occupancy
+    - binary_sensor.hallway_sensor_occupancy
+    from: 'off'
+    to: 'on'
+  condition:
+  - '{{ is_state(''sensor.home_state'', ''night'') }}'
+  action:
+  - service: light.turn_on
+    data:
+      brightness: 60
+      transition: 3
+    target:
+      entity_id:
+      - light.front_door_light
+  - service: light.turn_on
+    data:
+      brightness_pct: 2
+    target:
+      entity_id: light.sink_lights
+  - wait_for_trigger:
+      platform: state
+      entity_id:
+      - binary_sensor.hallway_sensor_motion
+      - binary_sensor.landing_sensor_motion
+      from: 'on'
+      to: 'off'
+  - delay: 00:05:00
+  - service: light.turn_off
+    data:
+      transition: 3
+    target:
+      entity_id:
+      - light.front_door_light
+  mode: restart
+  max_exceeded: silent
+- id: '1685159066135'
+  alias: 'Kitchen: Double tap for dinner'
+  description: Double tap kitchen switch up for dinner mode
+  trigger:
+  - platform: event
+    event_type: zwave_js_value_notification
+    event_data:
+      domain: zwave_js
+      node_id: 33
+      command_class: 91
+      command_class_name: Central Scene
+      label: Scene 001
+      property_key: '001'
+      value: KeyPressed2x
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      brightness_pct: 76
+    target:
+      entity_id:
+      - light.dining_lights
+      - light.island_lights
+      - light.kitchen_lights
+  mode: single
+- id: '1688283834828'
+  alias: Blond closed before sun
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunrise
+    offset: '-1:00:00'
+  condition: []
+  action:
+  - service: cover.close_cover
+    data: {}
+    target:
+      entity_id: cover.bedroom_blind_center_window_covering
+  mode: single
+- id: '1689102095367'
+  alias: 'Living Room: Front Door Dash - Set Screensaver Timeout'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.home_state
+  - platform: homeassistant
+    event: start
+  condition: []
+  action:
+  - service: number.set_value
+    entity_id: number.front_door_dash_screensaver_timer
+    data:
+      value: "{% if is_state('sensor.home_state', 'day') %}\n  1800\n{% elif is_state('sensor.home_state',
+        'evening') %}\n  60\n{% else %}\n  10\n{% endif %}\n"
+  - service: button.press
+    entity_id: button.front_door_dash_load_start_url
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.front_door_dash_screen
+  mode: single
+- id: '1689109092479'
+  alias: 'Living Room: Kitchen Speaker - Announce Trash Dash'
+  description: ''
+  trigger:
+  - platform: time
+    at: 07:45:00
+  condition:
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: sensor.garbage_trash
+      state: '0'
+    - condition: state
+      entity_id: sensor.garbage_recycling
+      state: '0'
+  action:
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.kitchen_display
+      volume_level: 0.8
+  - delay:
+      seconds: 2
+  - service: tts.cloud_say
+    data:
+      entity_id: media_player.kitchen_display
+      message: "It is Garbage day.  Don't forget to take out the trash {% if is_state('sensor.garbage_recycling',
+        '0') %}\n and the recycling\n{% endif %}\n"
+  - delay:
+      seconds: 10
+  - service: media_player.volume_set
+    data:
+      entity_id: media_player.kitchen_display
+      volume_level: 0.4
+  mode: single
+- id: '1689109111098'
+  alias: 'Living Room: Turn off front door light at sunrise'
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunrise
+    offset: +01:00:00
+  condition: []
+  action:
+  - service: light.turn_off
+    entity_id: light.front_door_light
+  mode: single
+- id: '1692052423186'
+  alias: 'Shed: Close Door on idle'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - cover.shed_door
+    to: open
+    for:
+      hours: 1
+      minutes: 30
+      seconds: 0
+  condition: []
+  action:
+  - service: cover.close_cover
+    data: {}
+    target:
+      entity_id: cover.shed_door
+  mode: single
+- id: '1693025763740'
+  alias: 'Closet Button: Toggle Light'
+  description: ''
+  trigger:
+  - platform: device
+    domain: mqtt
+    device_id: 98dc09cf71205cad92361d1934ddb2c3
+    type: action
+    subtype: 'on'
+    discovery_id: 0x0c4314fffea5735b action_on
+  condition: []
+  action:
+  - service: light.toggle
+    data: {}
+    target:
+      entity_id: light.closet_relay
+  mode: single
+- id: '1693195283371'
+  alias: 'Garage: light on when doors open'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.garage_active
+  condition: []
+  action:
+  - service: "{% if is_state('binary_sensor.garage_active', 'on') %}\n  light.turn_on\n{%
+      else %}\n  light.turn_off\n{% endif %}\n"
+    entity_id: light.garage_lights
+  mode: single
+- id: '1693195583118'
+  alias: 'Garage: Reset garage_active sensor when lights turned off'
+  description: 'If you turn the lights off when you leave, the sensor won''t reset
+    for 10 minutes so the lights won''t come on the next time you open the door '
+  trigger:
+  - platform: state
+    entity_id: switch.garage_lights
+    to: 'off'
+  condition: []
+  action:
+  - service: python_script.set_state
+    data_template:
+      entity_id: binary_sensor.garage_active
+      state: 'off'
+  mode: single
+- id: '1693195667716'
+  alias: 'Garage: Door - Close when no motion for 30 minutes'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.garage_sensor_motion
+    from: 'on'
+    to: 'off'
+    for: 00:30:00
+  condition:
+  - condition: state
+    entity_id: cover.garage_door
+    state: open
+  action:
+  - service: cover.close_cover
+    target:
+      entity_id: cover.garage_door
+    data: {}
+  mode: restart
+- id: '1694104628810'
+  alias: 'Bedroom: Ox Bedside at night'
+  description: ''
+  trigger:
+  - platform: time
+    at: '20:00:00'
+  condition:
+  - condition: state
+    entity_id: person.ox
+    state: home
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.ox_bedside_light
+  mode: single

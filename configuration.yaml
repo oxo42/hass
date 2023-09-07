@@ -22,7 +22,7 @@ logger:
   default: warn
   # default: info
   # logs:
-  #   homeassistant.components.zha: debug
+  #   homeassistant.components.zwave_js: debug
   #   zigpy: debug
 
 sensor:
@@ -48,6 +48,10 @@ zha:
     ota:
       ikea_provider: true
       ledvance_provider: true
+      inovelli_provider: true
+      salus_provider: true
+      sonoff_provider: true
+      thirdreality_provider: true
 
 panel_custom:
   - name: ha_integ
@@ -74,18 +78,23 @@ ifttt:
 
 stream:
 
-climate:
-  - platform: midea_ac
-    host: 10.42.0.20
-    id: !secret midea_id
-    token: !secret midea_token
-    k1: !secret midea_k1
+# climate:
+#   - platform: midea_ac
+#     host: 10.42.0.20
+#     id: !secret midea_id
+#     token: !secret midea_token
+#     k1: !secret midea_k1
 
 
 plant:
   front_door_plant:
-    sensors: 
+    sensors:
       moisture: sensor.plant_sensor_humidity
       battery: sensor.plant_senssor_power
       temperature: sensor.plant_sensor_temperature
     min_moisture: 20
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.18.0.0/16

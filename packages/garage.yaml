@@ -6,52 +6,5 @@ template:
         delay_off: 00:10:00
         state: >
           {{  is_state('cover.garage_door', 'open') 
-              or is_state('binary_sensor.garage_mudroom_door', 'on') 
+              or is_state('binary_sensor.garage_man_door', 'on') 
               or is_state('binary_sensor.garage_sensor_motion', 'on') }}
-
-automation garage:
-  - id: garage_lights_on
-    alias: "Garage: light on when doors open"
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.garage_active
-    action:
-      service: >
-        {% if is_state('binary_sensor.garage_active', 'on') %}
-          light.turn_on
-        {% else %}
-          light.turn_off
-        {% endif %}
-      entity_id: light.garage_lights
-
-  # If you turn the lights off when you leave, the sensor won't reset for 10 minutes so the lights won't come on the next time you open the door
-  # This resets the sensor state
-  - id: garage_active_sensor_reset
-    alias: "Garage: Reset garage_active sensor when lights turned off"
-    trigger:
-      - platform: state
-        entity_id: switch.garage_lights
-        to: "off"
-    action:
-      service: python_script.set_state
-      data_template:
-        entity_id: binary_sensor.garage_active
-        state: "off"
-
-  - id: garage_door_close_on_idle
-    alias: "Garage: Door - Close when no motion for 30 minutes"
-    mode: restart
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.garage_sensor_motion
-        from: "on"
-        to: "off"
-        for: 00:30:00
-    condition:
-      - condition: state
-        entity_id: cover.garage_door
-        state: open
-    action:
-      - service: cover.close_cover
-        target:
-          entity_id: cover.garage_door
