@@ -16,12 +16,14 @@ group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
-# cloud: !include cloud.yaml
 
 logger:
   default: warn
   # default: info
   # logs:
+  #   libdyson: debug
+  #   custom_components.dyson_local: debug
+  #   custom_components.dyson_cloud: debug
   #   homeassistant.components.zwave_js: debug
   #   zigpy: debug
 
@@ -43,15 +45,15 @@ sensor:
 
 python_script:
 
-zha:
-  zigpy_config:
-    ota:
-      ikea_provider: true
-      ledvance_provider: true
-      inovelli_provider: true
-      salus_provider: true
-      sonoff_provider: true
-      thirdreality_provider: true
+# zha:
+#   zigpy_config:
+#     ota:
+#       ikea_provider: true
+#       ledvance_provider: true
+#       inovelli_provider: true
+#       salus_provider: true
+#       sonoff_provider: true
+#       thirdreality_provider: true
 
 panel_custom:
   - name: ha_integ

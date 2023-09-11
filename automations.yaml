@@ -126,9 +126,17 @@
   action:
   - choose:
     - conditions:
-      - condition: state
-        entity_id: binary_sensor.study_occupancy
-        state: 'on'
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: binary_sensor.study_occupancy
+          state: 'on'
+        - condition: state
+          entity_id: sensor.study_occupancy_presence_event
+          state: approach
+        - condition: state
+          entity_id: sensor.study_occupancy_presence_event
+          state: enter
       sequence:
       - service: light.turn_on
         data: {}
