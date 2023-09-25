@@ -100,3 +100,9 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     - 172.18.0.0/16
+
+wake_on_lan:
+
+switch:
+  - platform: wake_on_lan
+    mac: "e0:4f:43:e6:36:6b"

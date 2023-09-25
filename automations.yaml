@@ -110,7 +110,7 @@
   - service: light.toggle
     data: {}
     target:
-      entity_id: light.closet_light
+      entity_id: light.closet_light_bulb
   mode: single
 - id: '1663713505830'
   alias: 'Study: Occupancy'
@@ -204,15 +204,6 @@
       remote: 96acb7fe9be494fddeeba65997db51a1
       cover:
         entity_id: cover.study_blind
-- id: '1663779488762'
-  alias: 'Nursery: Blind Open/Close'
-  description: ''
-  use_blueprint:
-    path: S-Collison/ikea_open_close_remote.yaml
-    input:
-      remote: 8252a3a532e64de7f650e0209a8d6dc3
-      cover:
-        entity_id: cover.nursery_blind
 - id: someone_is_coming_home
   alias: 'Home: Someone is coming home'
   trigger:
@@ -314,17 +305,8 @@
       value: KeyPressed
   condition: []
   action:
-  - service: cover.close_cover
+  - service: script.nursery_lights_out_white_noise_on
     data: {}
-    target:
-      entity_id: cover.nursery_blind
-  - service: light.turn_off
-    data: {}
-    target:
-      entity_id:
-      - light.nursery_ceiling
-      - light.kids_closet_lights
-      - light.nursery_lamp
   mode: single
 - id: '1665849187744'
   alias: 'Nursery: Scene Center: Lights off'
@@ -452,55 +434,6 @@
       entity_id: input_boolean.enable_marvin
     data: {}
   mode: single
-- id: '1675789562876'
-  alias: 'Nursery: Button'
-  description: ''
-  trigger:
-  - platform: event
-    event_type: zha_event
-    event_data:
-      device_id: 0ddde75b7640155de09f558fb4942612
-  condition: []
-  action:
-  - variables:
-      press_type: '{{ trigger.event.data.args.press_type }}'
-  - choose:
-    - conditions:
-      - '{{ press_type == ''single'' }}'
-      sequence:
-      - service: light.turn_on
-        data:
-          brightness: 3
-          transition: 5
-        target:
-          entity_id:
-          - light.nursery_lamp
-      - delay: 5
-      - service: light.turn_off
-        target:
-          entity_id: light.nursery_ceiling
-        data: {}
-    - conditions:
-      - '{{ press_type == ''double'' }}'
-      sequence:
-      - service: light.turn_on
-        data:
-          brightness: 205
-          transition: 5
-        target:
-          entity_id: light.nursery_lamp
-      - delay: 5
-      - service: light.turn_off
-        target:
-          entity_id: light.nursery_ceiling
-        data: {}
-    - conditions:
-      - '{{ press_type == ''hold'' }}'
-      sequence:
-      - service: script.nursery_lights_out_white_noise_on
-        data: {}
-  mode: restart
-  max_exceeded: silent
 - id: '1675789633752'
   alias: 'Nursery: heat at night'
   description: ''
@@ -534,15 +467,15 @@
   condition: []
   action:
   - service: climate.set_hvac_mode
-    target:
-      entity_id: climate.dyson_heater
     data:
       hvac_mode: cool
-  - service: fan.set_preset_mode
     target:
-      entity_id: fan.dyson_heater
+      entity_id: climate.nursery
+  - service: fan.set_preset_mode
     data:
       preset_mode: Auto
+    target:
+      entity_id: fan.nursery
   mode: single
 - id: '1680795731179'
   alias: 'Living Room: Dock roomba when home not empty or idle for 10 minutes'
@@ -810,10 +743,10 @@
   trigger:
   - platform: state
     entity_id:
-    - cover.shed_door
-    to: open
+    - binary_sensor.shed_motion
+    to: 'off'
     for:
-      hours: 1
+      hours: 0
       minutes: 30
       seconds: 0
   condition: []
@@ -822,6 +755,13 @@
     data: {}
     target:
       entity_id: cover.shed_door
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.shed_garden
+      - light.shed_driveway
+      - light.shed_ceiling
   mode: single
 - id: '1693025763740'
   alias: 'Closet Button: Toggle Light'
@@ -838,7 +778,7 @@
   - service: light.toggle
     data: {}
     target:
-      entity_id: light.closet_relay
+      entity_id: light.closet_light_bulb
   mode: single
 - id: '1693195283371'
   alias: 'Garage: light on when doors open'
@@ -901,4 +841,146 @@
     data: {}
     target:
       entity_id: light.ox_bedside_light
+  mode: single
+- id: '1694483186047'
+  alias: 'Nursery: Button Double Click'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.nursery_button_action
+    to: double
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      brightness: 206
+    target:
+      entity_id: light.nursery_lamp
+  mode: single
+- id: '1694483369046'
+  alias: 'Nursery: Button Hold'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.nursery_button_action
+    to: hold
+  condition: []
+  action:
+  - service: script.nursery_lights_out_white_noise_on
+    data: {}
+  mode: single
+- id: '1694483628274'
+  alias: 'Nursery: Button Click'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.nursery_button_action
+  condition: []
+  action:
+  - service: light.turn_on
+    data:
+      brightness: 3
+    target:
+      entity_id: light.nursery_lamp
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 2
+      milliseconds: 0
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.nursery_ceiling
+      - light.kids_closet_lights
+  mode: single
+- id: '1694830456006'
+  alias: 'Shed: Lights off when empty'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - cover.shed_door
+    to: closed
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  - platform: state
+    entity_id:
+    - binary_sensor.shed_man_door_open
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  condition:
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: cover.shed_door
+      for:
+        hours: 0
+        minutes: 30
+        seconds: 0
+      state: ''
+    - condition: state
+      entity_id: binary_sensor.shed_man_door_open
+      state: 'off'
+      for:
+        hours: 0
+        minutes: 30
+        seconds: 0
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+      - light.shed_driveway
+      - light.shed_garden
+      - light.shed_ceiling
+  mode: single
+- id: '1694901540420'
+  alias: 'Shed: Lights on with door open'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - cover.shed_door
+    to: open
+  condition:
+  - condition: sun
+    before: sunset
+    before_offset: '1:00:00'
+    after: sunrise
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id:
+      - light.shed_ceiling
+      - light.shed_garden
+      - light.shed_driveway
+  mode: single
+- id: '1695048494471'
+  alias: 'Shed: Lights on'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.shed_man_door_open
+    to: 'on'
+  - platform: state
+    entity_id:
+    - binary_sensor.shed_motion
+    to: 'on'
+  condition: []
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.shed_ceiling
   mode: single

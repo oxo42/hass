@@ -85,11 +85,15 @@ nursery_lights_out_white_noise_on:
     target:
       entity_id: light.mals_night_light
   - service: climate.set_temperature
-    target:
-      entity_id: climate.dyson_heater
     data:
       temperature: 22
       hvac_mode: heat
+    target:
+      entity_id: climate.nursery
+  - service: cover.close_cover
+    data: {}
+    target:
+      entity_id: cover.nursery_blind
   mode: single
 boil_kettle:
   alias: Boil Kettle
