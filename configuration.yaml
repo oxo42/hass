@@ -105,4 +105,5 @@ wake_on_lan:
 
 switch:
   - platform: wake_on_lan
+    name: work_pc
     mac: "e0:4f:43:e6:36:6b"
