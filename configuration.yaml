@@ -45,16 +45,6 @@ sensor:
 
 python_script:
 
-# zha:
-#   zigpy_config:
-#     ota:
-#       ikea_provider: true
-#       ledvance_provider: true
-#       inovelli_provider: true
-#       salus_provider: true
-#       sonoff_provider: true
-#       thirdreality_provider: true
-
 panel_custom:
   - name: ha_integ
     sidebar_title: Integrations
