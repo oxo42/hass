@@ -123,6 +123,14 @@
   - condition: state
     entity_id: input_boolean.study_guest_present
     state: 'off'
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: sensor.home_state
+      state: night
+    - condition: state
+      entity_id: binary_sensor.octoprint_printing
+      state: 'off'
   action:
   - choose:
     - conditions:
@@ -997,5 +1005,81 @@
   condition: []
   action:
   - service: script.good_night
+    data: {}
+  mode: single
+- id: '1701666269906'
+  alias: Xmas lights on
+  description: ''
+  trigger:
+  - platform: time
+    at: '16:30:00'
+  condition: []
+  action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id: light.christmas_lights
+  mode: single
+- id: '1703637359929'
+  alias: 'Outside: Lights on when someone comes home'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.home_empty
+    from: 'on'
+    to: 'off'
+  - platform: state
+    entity_id:
+    - person.ox
+    - person.callie
+    to: home
+  - platform: geo_location
+    source: device_tracker.r1s_location
+    zone: zone.home
+    event: enter
+  condition:
+  - condition: sun
+    before: sunrise
+    after: sunset
+    after_offset: '-1:00:00'
+  action:
+  - service: light.turn_on
+    target:
+      entity_id: light.outside_lights
+    data: {}
+  mode: single
+- id: '1703637601518'
+  alias: 'Home: Turns Empty'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.home_empty
+    to: 'on'
+  condition: []
+  action:
+  - service: light.turn_off
+    target:
+      entity_id:
+      - light.deck_lights
+      - light.dining_lights
+      - light.driveway_lights
+      - light.entrance_lights
+      - light.entrance_lights_basic
+      - light.garage_lights_basic
+      - light.garage_lights
+      - light.kids_closet_lights
+      - light.kitchen_lights
+      - light.living_room_lights
+      - light.island_lights
+      - light.mudroom_lights
+      - light.nursery_ceiling
+      - light.ox_bedside_light
+      - light.sink_lights
+      - light.streaming_light
+      - light.study_ceiling_lights
+      - light.walkway_lights
+      - light.study_lamp
     data: {}
   mode: single

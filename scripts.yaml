@@ -66,9 +66,29 @@ good_night:
       - light.mudroom_lights
   - service: light.turn_on
     data:
-      brightness_pct: 5
+      brightness_pct: 10
     target:
       entity_id: light.sink_lights
+  - service: switch.turn_off
+    target:
+      entity_id: switch.samsung_tv
+    data: {}
+  - if:
+    - condition: and
+      conditions:
+      - condition: state
+        entity_id: device_tracker.r1s_location
+        state: home
+      - condition: numeric_state
+        entity_id: sensor.r1s_battery_state_of_charge
+        below: 60
+      - condition: state
+        entity_id: binary_sensor.r1s_charger_connection
+        state: 'off'
+    then:
+    - service: notify.mobile_app_oxel7
+      data:
+        message: 'Rivian not charging '
   mode: restart
   icon: mdi:sleep
 nursery_lights_out_white_noise_on:
@@ -100,7 +120,7 @@ nursery_lights_out_white_noise_on:
       entity_id: cover.nursery_blind
   mode: single
 boil_kettle:
-  alias: Boil Kettle
+  alias: 'Kettle: Turn On'
   sequence:
   - service: ifttt.trigger
     data:

@@ -20,7 +20,8 @@ scene: !include scenes.yaml
 logger:
   default: warn
   # default: info
-  # logs:
+  logs:
+    custom_components.elgato: debug
   #   libdyson: debug
   #   custom_components.dyson_local: debug
   #   custom_components.dyson_cloud: debug
