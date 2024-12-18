@@ -126,9 +126,6 @@
   - condition: and
     conditions:
     - condition: state
-      entity_id: sensor.home_state
-      state: night
-    - condition: state
       entity_id: binary_sensor.octoprint_printing
       state: 'off'
   action:
@@ -146,30 +143,13 @@
           entity_id: sensor.study_occupancy_presence_event
           state: enter
       sequence:
-      - service: light.turn_on
+      - service: script.study_turn_on
+        metadata: {}
         data: {}
-        target:
-          entity_id:
-          - light.study_ceiling_lights
-          - light.streaming_light
-          - light.study_lamp
     default:
-    - service: light.turn_off
+    - service: script.study_shut_down
+      metadata: {}
       data: {}
-      target:
-        entity_id:
-        - light.study_ceiling_lights
-        - light.study_lamp
-        - light.streaming_light
-    - condition: not
-      conditions:
-      - condition: state
-        entity_id: climate.study_ac
-        state: 'off'
-    - service: climate.turn_off
-      data: {}
-      target:
-        entity_id: climate.study_ac
   mode: restart
 - id: study_blinds_shut
   alias: 'Study: Blinds shut at sunset'
@@ -196,13 +176,13 @@
     input:
       device: 771312246077ff9c4bb264b87f9778f7
       double_tap_on:
-      - scene: scene.study_lights_on_day
-      double_tap_off:
-      - scene: scene.study_lights_off
-      - service: climate.turn_off
+      - service: script.study_turn_on
+        metadata: {}
         data: {}
-        target:
-          entity_id: climate.study_ac
+      double_tap_off:
+      - service: script.study_shut_down
+        metadata: {}
+        data: {}
 - id: '1663779432861'
   alias: 'Study: Blind Open/Close'
   description: ''
@@ -261,43 +241,43 @@
     - service: script.doors_unlock
       data: {}
 - id: '1665792421763'
-  alias: 'Nursery: Scene TL: Lamp bright'
-  description: Ceiling off
-  trigger:
-  - platform: event
-    event_type: zwave_js_value_notification
+  alias: 'Nursery: Scene TL: Blinds'
+  description: ''
+  triggers:
+  - event_type: zwave_js_value_notification
     event_data:
       domain: zwave_js
       device_id: 15d84c77fe7d0af006dbf319e0c281e5
       command_class_name: Central Scene
       label: Scene 001
       value: KeyPressed
-  condition: []
-  action:
-  - service: light.turn_on
-    data:
-      brightness_pct: 81
+    trigger: event
+  conditions: []
+  actions:
+  - action: cover.toggle
     target:
-      entity_id: light.nursery_lamp
+      entity_id: cover.kids_blind
+    data: {}
   mode: single
 - id: '1665792534882'
-  alias: 'Nursery: Scene TR: Lamp dim'
-  trigger:
-  - platform: event
-    event_type: zwave_js_value_notification
+  alias: 'Nursery: Scene TR: Lamp'
+  description: ''
+  triggers:
+  - event_type: zwave_js_value_notification
     event_data:
       domain: zwave_js
       device_id: 15d84c77fe7d0af006dbf319e0c281e5
       command_class_name: Central Scene
       label: Scene 002
       value: KeyPressed
-  condition: []
-  action:
-  - service: light.turn_on
-    data:
-      brightness_pct: 1
+    trigger: event
+  conditions: []
+  actions:
+  - action: light.toggle
     target:
-      entity_id: light.nursery_lamp
+      entity_id:
+      - light.nursery_lamp
+    data: {}
   mode: single
 - id: '1665792617206'
   alias: 'Nursery: Scene BR: Night mode'
@@ -450,21 +430,16 @@
     at: '18:00'
   condition: []
   action:
-  - service: climate.turn_on
+  - data: {}
+    action: climate.turn_on
     target:
-      entity_id: climate.dyson_heater
-    data: {}
-  - service: climate.set_temperature
-    target:
-      entity_id: climate.dyson_heater
-    data:
+      entity_id: climate.nursery
+  - data:
       temperature: 22
       hvac_mode: heat
-  - service: fan.set_preset_mode
+    action: climate.set_temperature
     target:
-      entity_id: fan.dyson_heater
-    data:
-      preset_mode: Auto
+      entity_id: climate.nursery
   mode: single
 - id: '1675789645847'
   alias: 'Nursery: cool during the day'
@@ -998,14 +973,13 @@
   trigger:
   - platform: device
     domain: mqtt
-    device_id: 193afb190af92eb4b7f515eab49e5b27
-    type: action
-    subtype: hold
-    discovery_id: 0x286d9700010d264c action_hold
+    device_id: debd252c1d86b8bb6223d2e81c895fc5
+    type: click
+    subtype: double
   condition: []
   action:
-  - service: script.good_night
-    data: {}
+  - data: {}
+    action: script.good_night
   mode: single
 - id: '1701666269906'
   alias: Xmas lights on
@@ -1082,4 +1056,85 @@
       - light.walkway_lights
       - light.study_lamp
     data: {}
+  - service: climate.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: climate.study_ac
+  mode: single
+- id: '1719283665828'
+  alias: 'Shed: Ox going for a ride'
+  description: ''
+  trigger:
+  - platform: zone
+    entity_id: person.ox
+    zone: zone.home
+    event: leave
+    id: leave
+  - platform: zone
+    entity_id: person.ox
+    zone: zone.home_extended
+    event: enter
+    id: enter
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - leave
+      sequence:
+      - service: cover.close_cover
+        target:
+          entity_id: cover.shed_door
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - enter
+      sequence:
+      - service: cover.open_cover
+        metadata: {}
+        data: {}
+        target:
+          entity_id: cover.shed_door
+      - service: automation.turn_off
+        target:
+          entity_id: automation.shed_door_open_on_ox_home
+        data:
+          stop_actions: true
+  mode: single
+- id: '1729359134823'
+  alias: 'Living Room: Blinds'
+  description: ''
+  triggers:
+  - trigger: sun
+    event: sunset
+    offset: '-1:00:00'
+    id: sunset
+  - trigger: sun
+    event: sunrise
+    offset: 0
+    id: sunrise
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - sunset
+      sequence:
+      - device_id: 73ebacd536d7340a211b65361b15b80b
+        domain: cover
+        entity_id: 64bc5971eb9db5e29f7fb29e795cae4a
+        type: close
+    - conditions:
+      - condition: trigger
+        id:
+        - sunrise
+      sequence:
+      - device_id: 73ebacd536d7340a211b65361b15b80b
+        domain: cover
+        entity_id: 64bc5971eb9db5e29f7fb29e795cae4a
+        type: open
   mode: single

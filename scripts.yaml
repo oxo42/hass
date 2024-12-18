@@ -1,21 +1,3 @@
-babycam_kitchen:
-  alias: Baby cam to kitchen
-  sequence:
-  - service: media_player.play_media
-    target:
-      entity_id: media_player.kitchen_display
-    data:
-      media_content_id: http://10.0.0.2:8080/babycam.m3u8
-      media_content_type: video
-babycam_study:
-  alias: Baby cam to study
-  sequence:
-  - service: media_player.play_media
-    target:
-      entity_id: media_player.study_display
-    data:
-      media_content_id: http://10.0.0.2:8080/babycam.m3u8
-      media_content_type: video
 close_garages:
   alias: Close Garage and Shed doors
   sequence:
@@ -64,6 +46,9 @@ good_night:
       - light.shed_garden
       - light.walkway_lights
       - light.mudroom_lights
+      - light.mirror_lights
+      - light.master_bath_ceiling
+      - light.shower_lights
   - service: light.turn_on
     data:
       brightness_pct: 10
@@ -89,35 +74,57 @@ good_night:
     - service: notify.mobile_app_oxel7
       data:
         message: 'Rivian not charging '
+    - repeat:
+        count: 5
+        sequence:
+        - service: light.toggle
+          target:
+            entity_id:
+            - light.ox_bedside_light
+            device_id: []
+            area_id: []
+          data: {}
+        - delay:
+            hours: 0
+            minutes: 0
+            seconds: 2
+            milliseconds: 0
+    - service: light.turn_on
+      metadata: {}
+      data: {}
+      target:
+        entity_id: light.mudroom_lights
   mode: restart
   icon: mdi:sleep
 nursery_lights_out_white_noise_on:
   alias: 'Nursery: Night mode'
   sequence:
-  - service: light.turn_off
-    target:
+  - target:
       entity_id:
       - light.nursery_ceiling
       - light.kids_closet_lights
       - light.nursery_lamp
+      - light.christmas_lights
     data: {}
-  - service: light.turn_on
-    entity_id: light.mals_night_light
+    action: light.turn_off
+  - entity_id: light.mals_night_light
     data:
       color_name: red
       brightness: 3
     target:
       entity_id: light.mals_night_light
-  - service: climate.set_temperature
-    data:
+    action: light.turn_on
+  - data:
       temperature: 22
       hvac_mode: heat
     target:
       entity_id: climate.nursery
-  - service: cover.close_cover
-    data: {}
+    enabled: false
+    action: climate.set_temperature
+  - data: {}
+    action: cover.close_cover
     target:
-      entity_id: cover.nursery_blind
+      entity_id: cover.kids_blind
   mode: single
 boil_kettle:
   alias: 'Kettle: Turn On'
@@ -221,3 +228,59 @@ watching_tv:
       entity_id: light.mudroom_lights
   mode: single
   icon: mdi:television
+study_shut_down:
+  alias: 'Study: Shut down'
+  sequence:
+  - service: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - light.study_ceiling_lights
+      - light.streaming_light
+  - service: climate.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: climate.study_ac
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.lenovo_starview_screensaver
+  description: ''
+study_turn_on:
+  alias: 'Study: Turn on'
+  sequence:
+  - service: light.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id:
+      - light.study_ceiling_lights
+      - light.streaming_light
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.lenovo_starview_screensaver
+  - service: button.press
+    metadata: {}
+    data: {}
+    target:
+      entity_id: button.lenovo_starview_load_start_url
+  - service: automation.turn_off
+    metadata: {}
+    data:
+      stop_actions: true
+    target:
+      entity_id: automation.study_occupancy_dash_on
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - service: automation.turn_on
+    metadata: {}
+    data: {}
+    target:
+      entity_id: automation.study_occupancy_dash_on
+  description: ''
